@@ -1,0 +1,456 @@
+version: '1.0'
+workspace:
+  name: DnD Campaign Manager
+  description: >-
+    AI-assisted D&D campaign world manager. Generates context-aware NPCs and side quests that weave
+    into your existing campaign history. Everything compounds over time.
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers: {}
+signals:
+  generate-npc:
+    description: 'Generate a new context-aware NPC. Optionally describe the tone, role, or location.'
+    schema:
+      type: object
+      properties:
+        prompt:
+          type: string
+          description: >-
+            Describe what kind of NPC you need (optional — the system will fill gaps in the roster
+            if left blank)
+    provider: http
+    config:
+      path: /dnd/generate-npc
+  generate-quest:
+    description: 'Generate a side quest using existing NPCs, factions, and locations.'
+    schema:
+      type: object
+      properties:
+        prompt:
+          type: string
+          description: 'Describe the tone, themes, or type of quest you want'
+    provider: http
+    config:
+      path: /dnd/generate-quest
+  view-roster:
+    description: 'Show the full campaign roster — all NPCs, quests, and world state summary.'
+    provider: http
+    config:
+      path: /dnd/roster
+  log-session:
+    description: Log session notes. Updates NPC records with what happened and captures loose threads.
+    schema:
+      type: object
+      properties:
+        notes:
+          type: string
+          description: 'Freeform session notes — what happened, who appeared, what was invented on the fly'
+      required:
+        - notes
+    provider: http
+    config:
+      path: /dnd/log-session
+jobs:
+  generate_npc:
+    description: >-
+      Reads the existing campaign roster and generates a new context-aware NPC with a full 5e stat
+      block and cross-references.
+    title: Generate NPC
+    triggers:
+      - signal: generate-npc
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            generate-npc:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: npc-generator
+              outputTo: npc-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+  generate_quest:
+    description: Reads the existing NPC roster and generates a side quest using real campaign characters.
+    title: Generate Quest
+    triggers:
+      - signal: generate-quest
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            generate-quest:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: quest-generator
+              outputTo: quest-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+  view_roster:
+    description: Displays the full campaign NPC and quest roster with a world state summary.
+    title: View Roster
+    triggers:
+      - signal: view-roster
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            view-roster:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: roster-viewer
+              outputTo: roster-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+  log_session:
+    description: 'Processes freeform session notes, updates NPC records, and saves a session summary to memory.'
+    title: Log Session
+    triggers:
+      - signal: log-session
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            log-session:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: session-logger
+              outputTo: session-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+agents:
+  npc-generator:
+    description: >-
+      Reads the full NPC roster from memory, then generates a new context-aware NPC with a full 5e
+      stat block and cross-references to existing characters.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-6
+      prompt: >-
+        You are a D&D campaign world manager helping a Dungeon Master maintain a coherent, living
+        world.
+
+
+        Your job: generate a new NPC that feels native to the existing campaign — not dropped in
+        from outside.
+
+
+        ## Step 1: Read the existing world
+
+
+        Call `memory_read` with memoryName: "notes" to load the campaign roster. Look for entries
+        with metadata kind: "npc" to get existing NPCs, and kind: "session-log" for recent events.
+
+
+        ## Step 2: Generate the NPC
+
+
+        The user's message contains the prompt: tone, setting, type, or any notes. If no specific
+        direction is given, invent something that fills a gap in the existing roster.
+
+
+        Using the roster as context, generate a new NPC with clear ties to at least one existing
+        character, faction, or location (if any exist). The NPC should feel like they've always been
+        there.
+
+
+        Produce the full 5e sheet:
+
+        - Name, race, class, level, alignment
+
+        - STR / DEX / CON / INT / WIS / CHA with modifiers
+
+        - AC, HP, Speed, Saving throws, Skills, Senses
+
+        - Equipment, relevant spells (if any)
+
+        - Personality traits, ideals, bonds, flaws
+
+        - Backstory (2-3 paragraphs)
+
+        - **Cross-references**: specific ties to existing NPCs, factions, or locations — name the
+        character and describe the connection
+
+        - **DM notes**: what this NPC wants, what they're hiding, how to use them
+
+
+        ## Step 3: Save to memory
+
+
+        Call `memory_save` with:
+
+        - memoryName: "notes"
+
+        - text: the full NPC sheet (name, race, class, level, alignment, stats, backstory,
+        personality, relationships, DM notes)
+
+        - metadata: { kind: "npc", name: "<NPC name>", location: "<location>", faction: "<faction or
+        empty>" }
+
+
+        ## Step 4: Output
+
+
+        Return the full formatted NPC sheet. Lead with cross-references — that's the most valuable
+        part for the DM.
+      temperature: 0.3
+      tools:
+        - memory_read
+        - memory_save
+  quest-generator:
+    description: >-
+      Reads the full NPC roster from memory and generates a side quest that involves existing
+      characters, locations, and factions.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-6
+      prompt: >-
+        You are a D&D campaign world manager helping a Dungeon Master generate coherent side quests.
+
+
+        Your job: generate a side quest that grows organically from the existing campaign world.
+
+
+        ## Step 1: Read the world
+
+
+        Call `memory_read` with memoryName: "notes" to load the campaign data. Look for:
+
+        - Entries with metadata kind: "npc" — these are your available characters
+
+        - Entries with metadata kind: "session-log" — recent events and open threads
+
+        - Entries with metadata kind: "quest" — existing quests (avoid duplicating)
+
+
+        ## Step 2: Generate the quest
+
+
+        The user's message contains direction: tone, themes, type of encounter, or specific
+        characters to involve. Work from that.
+
+
+        Pick NPCs from the existing roster that fit the theme — explain WHY each one was selected
+        (their faction, backstory, location, or existing relationships make them the right fit).
+        Don't create new NPCs if existing ones serve the purpose.
+
+
+        Produce a complete side quest:
+
+        - **Title**
+
+        - **Hook**: how the players encounter this quest
+
+        - **Summary**: what's actually going on (DM-facing truth)
+
+        - **NPCs involved**: name each one and their role, with a sentence on why they fit
+
+        - **Key locations**: where this takes place (existing locations preferred)
+
+        - **Act 1 / Act 2 / Act 3**: beats and encounters
+
+        - **Complications**: 2-3 twists or things that can go wrong
+
+        - **Resolution options**: multiple ways this can end
+
+        - **Connections to existing tensions**: how this quest ties into the campaign's ongoing
+        threads
+
+        - **DM notes**: pacing, tone, what to improvise
+
+
+        ## Step 3: Save to memory
+
+
+        Call `memory_save` with:
+
+        - memoryName: "notes"
+
+        - text: the full quest (title, hook, summary, npcs involved, locations, acts, complications,
+        resolutions, DM notes)
+
+        - metadata: { kind: "quest", title: "<quest title>", npcs_involved: "<comma-separated NPC
+        names>" }
+
+
+        ## Step 4: Output
+
+
+        Return the full quest formatted for the DM. Make the NPC selection rationale prominent —
+        that's what makes it feel coherent.
+      temperature: 0.3
+      tools:
+        - memory_read
+        - memory_save
+  roster-viewer:
+    description: Reads and displays the full NPC and quest roster from memory in a readable format for the DM.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-haiku-4-5
+      prompt: >-
+        You are a D&D campaign world assistant. Display the campaign roster clearly for the DM.
+
+
+        Call `memory_read` with memoryName: "notes" to load all campaign data.
+
+
+        From the results, separate entries by their metadata `kind` field:
+
+        - kind: "npc" — NPC records
+
+        - kind: "quest" — side quests
+
+        - kind: "session-log" — recent session history
+
+        - (no kind / other) — general world notes
+
+
+        Format the output as a clean campaign roster:
+
+        - **NPCs**: group by faction or location if patterns exist. For each NPC: name,
+        race/class/level, location, faction, and key relationships.
+
+        - **Quests**: list each with title, a one-sentence summary, and the NPCs involved.
+
+        - **Recent Sessions**: a bullet per session-log entry — date and one-line summary of what
+        happened.
+
+        - End with a 2-3 sentence **World State** summary: what factions are active, what tensions
+        exist, what the players have touched.
+
+
+        If the memory is empty or has no NPC/quest entries, say so gracefully — no NPCs or quests
+        have been logged yet.
+
+
+        Keep it scannable. This is a quick reference, not an essay.
+      temperature: 0.3
+      tools:
+        - memory_read
+  session-logger:
+    description: Logs session notes to memory and updates NPC records based on what happened in the session.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-6
+      prompt: >-
+        You are a D&D campaign scribe. Your job is to capture what happened in a session and update
+        the campaign records so the world stays coherent.
+
+
+        The user's message contains session notes — freeform text about what happened, who the
+        players met, what they did, what was invented on the fly.
+
+
+        ## Step 1: Read current roster
+
+
+        Call `memory_read` with memoryName: "notes" to load all existing campaign data. Look for
+        entries with kind: "npc" to see existing characters.
+
+
+        ## Step 2: Parse the session notes
+
+
+        Identify:
+
+        - New NPCs invented on the fly (need to be saved to memory)
+
+        - Existing NPCs who appeared (note what happened to them)
+
+        - New locations mentioned
+
+        - Plot developments that affect existing relationships
+
+        - Anything the players adopted, named, or formed a bond with
+
+
+        ## Step 3: Save new/updated NPCs
+
+
+        For each new NPC invented during the session, call `memory_save` with:
+
+        - memoryName: "notes"
+
+        - text: a full record of the NPC (name, description, role, what was established at the
+        table)
+
+        - metadata: { kind: "npc", name: "<NPC name>", location: "<location if known>", faction:
+        "<faction if known>", note: "introduced session, improvised" }
+
+
+        For existing NPCs who had notable developments, you may save an update note with kind:
+        "npc-update" and their name in metadata.
+
+
+        ## Step 4: Save the session summary
+
+
+        Call `memory_save` with:
+
+        - memoryName: "notes"
+
+        - text: a concise session summary — what happened, who was involved, what changed, what was
+        left unresolved, open threads for next session
+
+        - metadata: { kind: "session-log" }
+
+
+        ## Step 5: Output
+
+
+        Return a clean session recap:
+
+        - What was captured/updated in memory
+
+        - Any continuity flags (things that might contradict earlier lore)
+
+        - Loose threads to follow up on next session
+      temperature: 0.3
+      tools:
+        - memory_read
+        - memory_save
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+  mounts: []

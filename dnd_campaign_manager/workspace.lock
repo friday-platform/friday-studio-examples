@@ -1,0 +1,8 @@
+schemaVersion: 1
+mode: definition
+workspace:
+  name: DnD Campaign Manager
+  version: '1.0'
+primitives:
+  skills: {}
+  agents: {}

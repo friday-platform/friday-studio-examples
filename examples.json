@@ -10,5 +10,9 @@
   {
     "name": "Networking CRM",
     "folder": "networking-crm"
+  },
+  {
+    "name": "DnD Campaign Manager",
+    "folder": "dnd_campaign_manager"
   }
 ]

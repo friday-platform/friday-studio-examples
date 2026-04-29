@@ -4,19 +4,34 @@ workspace:
   description: >-
     Relationship tracking system — log interactions, surface follow-ups, and keep your network warm
     over time.
+signals:
+  crm-chat:
+    description: 'Log an interaction, add context, or ask about a contact'
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: 'Your message — log an interaction, add contact context, or ask about someone'
+      required:
+        - message
+    provider: http
+    config:
+      path: /crm/chat
 communicators:
   telegram:
     kind: telegram
 jobs:
   crm-interact:
     title: CRM Interaction
+    triggers:
+      - signal: crm-chat
     fsm:
-      id: crm-interact-pipeline
       initial: idle
       states:
         idle:
           'on':
-            slack-chat:
+            crm-chat:
               target: respond
         respond:
           entry:
@@ -73,8 +88,8 @@ agents:
       max_tokens: 1000
       tool_choice: auto
       tools:
-        - memory_narrative_append
-        - memory_narrative_read
+        - memory_save
+        - memory_read
 memory:
   own:
     - name: notes
@@ -83,4 +98,12 @@ memory:
     - name: memory
       type: long_term
       strategy: narrative
-  mounts: []
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
