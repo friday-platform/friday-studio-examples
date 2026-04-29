@@ -14,5 +14,9 @@
   {
     "name": "DnD Campaign Manager",
     "folder": "dnd_campaign_manager"
+  },
+  {
+    "name": "Competitive Monitor",
+    "folder": "competitive-monitor"
   }
 ]

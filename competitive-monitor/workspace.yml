@@ -1,0 +1,130 @@
+version: '1.0'
+workspace:
+  name: Competitive Monitor
+  description: >-
+    Weekly competitor intelligence — searches for product moves, pricing changes, and GTM signals,
+    clusters them by theme, and delivers a sourced brief with dates every Monday morning.
+signals:
+  run-now:
+    description: Trigger a competitive scan on demand
+    schema:
+      additionalProperties: false
+      properties:
+        competitors:
+          description: List of competitor names to focus on. Defaults to scan-config in memory.
+          items:
+            type: string
+          type: array
+        focus_areas:
+          description: Which themes to prioritize. Defaults to scan-config in memory.
+          items:
+            enum:
+              - pricing
+              - product
+              - packaging
+              - gtm
+              - partnerships
+              - leadership
+            type: string
+          type: array
+        lookback_days:
+          description: How many days back to search. Defaults to 7.
+          maximum: 90
+          minimum: 1
+          type: integer
+      type: object
+    provider: http
+    config:
+      path: /run-now
+      timeout: 10m
+  weekly-scan:
+    description: Monday morning competitive scan at 8am PT
+    provider: schedule
+    config:
+      schedule: 0 8 * * 1
+      timezone: America/Los_Angeles
+jobs:
+  competitive-scan:
+    title: Competitive Monitor Weekly Scan
+    triggers:
+      - signal: weekly-scan
+      - signal: run-now
+    inputs:
+      type: object
+      properties:
+        competitors:
+          type: array
+          items:
+            type: string
+        focus_areas:
+          type: array
+          items:
+            type: string
+        lookback_days:
+          type: integer
+          default: 7
+      additionalProperties: false
+    fsm:
+      id: competitive-scan-pipeline
+      initial: idle
+      states:
+        idle:
+          'on':
+            weekly-scan:
+              target: research
+            run-now:
+              target: research
+        research:
+          entry:
+            - type: agent
+              agentId: competitive-analyst
+              outputTo: scan-report
+              prompt: >-
+                Run a competitive intelligence scan for the last 7 days on these competitors:
+                Google, Facebook.
+
+
+                For each competitor, search the web for recent news. Visit each source page to
+                confirm the exact date and URL. Every finding MUST include:
+
+                1. What happened
+
+                2. Announced: Month Day, YYYY (exact, confirmed from article)
+
+                3. Source: [Publication Name](https://specific-article-url)
+
+
+                Drop any finding without a confirmed article URL and verified date. No fabricated
+                dates. No homepage links. No recommendations.
+
+
+                Cluster findings by theme (pricing, product, packaging, GTM, partnerships,
+                leadership).
+            - type: emit
+              event: ADVANCE
+          'on':
+            ADVANCE:
+              target: done
+        done:
+          type: final
+    config:
+      timeout: 15m
+agents:
+  competitive-analyst:
+    type: atlas
+    agent: web
+    description: >-
+      Researches competitor moves via web search and produces a clustered intelligence brief with
+      sources
+    prompt: >-
+      You are a competitive intelligence analyst. Your task will tell you what to do step by step.
+      Follow the steps exactly in order.
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts: []
