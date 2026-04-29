@@ -1,0 +1,14 @@
+[
+  {
+    "name": "GitHub Digest",
+    "folder": "github-digest"
+  },
+  {
+    "name": "GitHub PR Reviewer",
+    "folder": "github-pr-reviewer"
+  },
+  {
+    "name": "Networking CRM",
+    "folder": "networking-crm"
+  }
+]
