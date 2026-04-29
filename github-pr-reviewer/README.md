@@ -28,6 +28,8 @@ The reviewer posts directly to the GitHub PR as a formal review, with:
 - A summary comment with an overall verdict and key findings grouped by severity
 - A clear APPROVE, REQUEST_CHANGES, or COMMENT review state
 
+![PR review summary on GitHub](../assets/github-pr-reviewer/pr-review-summary-on-github.png)
+
 ---
 
 ## How to use it
@@ -35,6 +37,8 @@ The reviewer posts directly to the GitHub PR as a formal review, with:
 **Option 1: From the workspace**
 
 Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when prompted.
+
+![PR review request in chat](../assets/github-pr-reviewer/chat-pr-review-request.png)
 
 **Option 2: Via HTTP**
 

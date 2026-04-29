@@ -29,6 +29,8 @@ The digest is organized into three sections:
 > **Summary**
 > 1 open PR, 1 review pending. No urgent items.
 
+![PR digest output in chat](../assets/github-digest/chat-pr-digest-output.png)
+
 ---
 
 ## How to use it

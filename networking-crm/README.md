@@ -15,6 +15,8 @@ Networking CRM gives you a conversational relationship memory built for professi
 
 The assistant stores everything in a narrative memory — contact name, company/role, date, what happened, commitments made, and next follow-up action. It reads that memory to answer questions and proactively suggests who's due for a touchpoint based on relationship context.
 
+![Logging an interaction and asking for follow-ups in Telegram](../assets/networking-crm/telegram-crm-conversation.png)
+
 ---
 
 ## How to use it
@@ -49,11 +51,15 @@ The assistant will confirm every save, answer questions directly from what's bee
 1. Go to **Overview > Info > Communicators**
 2. Find the Telegram communicator and connect it
 
+![Connecting the Telegram communicator with a bot token](../assets/networking-crm/telegram-communicator-setup.png)
+
 Once connected, messages sent to the linked Telegram bot will trigger the CRM assistant automatically.
 
 ---
 
 ## How it works
+
+![Networking CRM workspace overview in Friday](../assets/networking-crm/workspace-overview.png)
 
 | Component | Role |
 |---|---|
