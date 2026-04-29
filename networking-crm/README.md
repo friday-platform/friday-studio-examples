@@ -39,14 +39,7 @@ The assistant will confirm every save, answer questions directly from what's bee
 
 ## Setup
 
-### 1. Import the workspace
-
-1. Open the Friday UI
-2. Go to **Settings → Backup & Restore**
-3. Click **Import a workspace**
-4. Upload the workspace zip file
-
-### 2. Connect the Telegram communicator
+### Connect the Telegram communicator
 
 1. Go to **Overview > Info > Communicators**
 2. Find the Telegram communicator and connect it
