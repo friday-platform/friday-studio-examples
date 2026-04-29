@@ -1,0 +1,8 @@
+schemaVersion: 1
+mode: definition
+workspace:
+  name: GitHub Digest
+  version: '1.0'
+primitives:
+  skills: {}
+  agents: {}

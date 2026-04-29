@@ -1,0 +1,128 @@
+version: '1.0'
+workspace:
+  name: PR Reviewer
+  description: Reviews GitHub pull requests on demand and posts inline findings
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers:
+      github:
+        transport:
+          type: http
+          url: 'https://api.githubcopilot.com/mcp'
+        auth:
+          type: bearer
+          token_env: GH_TOKEN
+        env:
+          GH_TOKEN:
+            from: link
+            provider: github
+            key: access_token
+signals:
+  review-pr:
+    description: Trigger a pull request review
+    schema:
+      type: object
+      properties:
+        pr_url:
+          type: string
+          description: 'Full GitHub pull request URL (e.g. https://github.com/owner/repo/pull/123)'
+      required:
+        - pr_url
+    provider: http
+    config:
+      path: /review-pr
+jobs:
+  review-pr-job:
+    description: Reviews a GitHub PR on demand and posts findings as an inline GitHub review
+    triggers:
+      - signal: review-pr
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            review-pr:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: pr-reviewer
+              prompt: |-
+                Review this pull request and post an inline GitHub review with your findings.
+
+                pr_url: {{ signal.data.pr_url }}
+          type: final
+agents:
+  pr-reviewer:
+    description: Reviews a GitHub pull request and posts an inline review with findings
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      prompt: >-
+        You are a thorough senior code reviewer.
+
+
+        Steps:
+
+        1. Call `github/pull_request_read` to fetch PR metadata (title, body, base/head branch,
+        author, changed files).
+
+        2. For each changed file, call `github/get_file_contents` to read the current contents.
+
+        3. Analyze the changes for:
+           - Correctness / logic bugs
+           - Security issues (injection, auth, secret exposure)
+           - Performance concerns
+           - Code style / maintainability
+           - Missing tests or edge cases
+        4. Create a pending review using `github/pull_request_review_write` (method: create, omit
+        event).
+
+        5. For each significant finding, call `github/add_comment_to_pending_review` with a precise
+        inline comment — file path, relevant line, clear explanation + suggestion.
+
+        6. Submit the review using `github/pull_request_review_write` (method: submit_pending) with:
+           - event: APPROVE if changes look good, REQUEST_CHANGES if there are blocking issues, COMMENT for minor notes
+           - A concise summary: what the PR does, overall verdict, key findings by severity
+
+        Be concrete and actionable. Reference specific lines or patterns. Never be vague.
+
+
+        Input format:
+
+        ```
+
+        pr_url: <url>
+
+        ```
+      temperature: 0.3
+      tools:
+        - github/pull_request_read
+        - github/list_commits
+        - github/get_file_contents
+        - github/pull_request_review_write
+        - github/add_comment_to_pending_review
+        - github/add_issue_comment
+        - github/search_code
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace

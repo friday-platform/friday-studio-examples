@@ -1,0 +1,86 @@
+version: '1.0'
+workspace:
+  name: Networking CRM
+  description: >-
+    Relationship tracking system — log interactions, surface follow-ups, and keep your network warm
+    over time.
+communicators:
+  telegram:
+    kind: telegram
+jobs:
+  crm-interact:
+    title: CRM Interaction
+    fsm:
+      id: crm-interact-pipeline
+      initial: idle
+      states:
+        idle:
+          'on':
+            slack-chat:
+              target: respond
+        respond:
+          entry:
+            - type: agent
+              agentId: crm-assistant
+              outputTo: crm-output
+              outputType: crm-response
+              prompt: >-
+                The user has sent a message. It is either logging an interaction with a contact,
+                adding context about a contact, or asking about a contact. If logging or adding
+                context, save it to memory in a structured format: contact name, date, summary, and
+                any follow-up action. If asking about a contact, read from memory and respond with
+                what you know. Always confirm what you did or answer clearly.
+            - type: emit
+              event: ADVANCE
+          'on':
+            ADVANCE:
+              target: done
+        done:
+          type: final
+    config:
+      timeout: 5m
+agents:
+  crm-assistant:
+    description: Manages networking relationships and follow-up reminders
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-5
+      prompt: >-
+        You are a networking CRM assistant. Your job is to help the user maintain and grow their
+        professional relationships. You track interactions, surface who needs a follow-up, and help
+        keep the network warm over time.
+
+
+        When the user logs an interaction or adds context about someone, save it to memory with:
+        contact name, company/role if known, date, what happened, any commitments made, and the next
+        follow-up action or timeline.
+
+
+        When the user asks about a contact, read from memory and summarize what you know — last
+        interaction, relationship strength, pending follow-ups, and any relevant context.
+
+
+        When the user asks who they should follow up with, scan memory and surface contacts whose
+        last interaction was a while ago or who have an outstanding next step.
+
+
+        Always be proactive about suggesting follow-up timing based on relationship context (e.g. a
+        warm lead needs a shorter follow-up cycle than a casual connection). Keep responses short
+        and conversational. Never fabricate relationship details. If you do not know something, say
+        so.
+      temperature: 0.3
+      max_tokens: 1000
+      tool_choice: auto
+      tools:
+        - memory_narrative_append
+        - memory_narrative_read
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts: []

@@ -1,0 +1,103 @@
+version: '1.0'
+workspace:
+  name: GitHub Digest
+  description: Scheduled GitHub PR and review digest every Monday and Thursday
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers:
+      github:
+        transport:
+          type: http
+          url: 'https://api.githubcopilot.com/mcp'
+        auth:
+          type: bearer
+          token_env: GH_TOKEN
+        env:
+          GH_TOKEN:
+            from: link
+            provider: github
+            key: access_token
+signals:
+  github-digest-schedule:
+    description: 'Fires every Monday and Thursday at 8:30am Pacific'
+    provider: schedule
+    config:
+      schedule: '30 15 * * 1,4'
+      timezone: UTC
+jobs:
+  github-digest-job:
+    description: 'Every Monday and Thursday: summarize open PRs and review requests for the GitHub user'
+    triggers:
+      - signal: github-digest-schedule
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            github-digest-schedule:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: github-digest-agent
+              outputTo: digest-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+agents:
+  github-digest-agent:
+    description: >-
+      Fetches open PRs and review requests for the authenticated GitHub user, then produces a
+      concise digest
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      prompt: >-
+        You are a GitHub digest assistant. Your task:
+
+
+        1. Call `github/get_me` to find the authenticated user's login.
+
+        2. Call `github/search_pull_requests` with query `is:pr is:open author:<login>` to get open
+        PRs authored by the user.
+
+        3. Call `github/search_pull_requests` with query `is:pr is:open review-requested:<login>` to
+        get PRs awaiting the user's review.
+
+        4. Produce a clean, scannable Markdown digest with these sections:
+           - **Your Open PRs** — title, repo, URL, age, and review status (approved/changes requested/awaiting)
+           - **Review Requested** — PRs where you're asked to review, with title, repo, URL, and author
+           - **Summary** — one sentence on total counts and any urgent items
+
+        Keep it concise. Use bullet points. Link every PR by title. Note if a section is empty.
+      temperature: 0.3
+      tools:
+        - github/get_me
+        - github/search_pull_requests
+        - github/pull_request_read
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
