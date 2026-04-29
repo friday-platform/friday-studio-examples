@@ -1,0 +1,151 @@
+version: '1.0'
+workspace:
+  name: Google Sheets Query
+  description: Query and explore Google Sheets data using natural language
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers:
+      google-sheets:
+        transport:
+          type: http
+          url: 'http://localhost:8005/mcp'
+        client_config:
+          timeout:
+            progressTimeout: 60s
+            maxTotalTimeout: 30m
+        auth:
+          type: bearer
+          token_env: GOOGLE_SHEETS_ACCESS_TOKEN
+        env:
+          GOOGLE_SHEETS_ACCESS_TOKEN:
+            from: link
+            provider: google-sheets
+            key: access_token
+        startup:
+          type: command
+          command: uvx
+          args:
+            - workspace-mcp
+            - '--tools'
+            - sheets
+            - '--transport'
+            - streamable-http
+          env:
+            WORKSPACE_MCP_PORT: '8005'
+          ready_url: 'http://localhost:8005/mcp'
+signals:
+  query-sheet:
+    description: Query a Google Sheet with a natural language question
+    schema:
+      type: object
+      properties:
+        question:
+          type: string
+          description: What do you want to know from the spreadsheet?
+        spreadsheet:
+          type: string
+          description: Spreadsheet name or URL (optional — agent will list available sheets if omitted)
+      required:
+        - question
+    provider: http
+    config:
+      path: /query-sheet
+jobs:
+  query-sheet-job:
+    description: Accepts a natural language question and queries the relevant Google Sheet to answer it
+    triggers:
+      - signal: query-sheet
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            query-sheet:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: sheets-query-agent
+              outputTo: query-result
+              prompt: >-
+                The user has a question about their Google Sheets data. Answer it fully, including
+                the source spreadsheet and sheet name.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+agents:
+  sheets-query-agent:
+    description: >-
+      Queries Google Sheets using natural language. Can list spreadsheets, read data, and answer
+      questions about sheet contents.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-6
+      prompt: >-
+        You are a Google Sheets assistant. You help users query, explore, and understand their
+        spreadsheet data.
+
+
+        Your capabilities:
+
+        - List available spreadsheets the user has access to
+
+        - Get info about a spreadsheet (sheet names, structure)
+
+        - Read values from any range or entire sheets
+
+        - Answer questions about the data you read
+
+
+        Workflow:
+
+        1. If the user hasn't specified a spreadsheet, call list_spreadsheets to show what's
+        available.
+
+        2. If a spreadsheet is specified but no sheet/range, call get_spreadsheet_info first to
+        understand the structure.
+
+        3. Read the relevant data with read_sheet_values, then answer the user's question directly.
+
+        4. When presenting tabular data, format it clearly as a list or structured summary.
+
+        5. Save key findings to memory so follow-up queries can reference prior context.
+
+
+        Always be specific about what data you found and where it came from (spreadsheet name, sheet
+        name, range).
+      temperature: 0.3
+      max_steps: 15
+      tools:
+        - google-sheets/list_spreadsheets
+        - google-sheets/get_spreadsheet_info
+        - google-sheets/read_sheet_values
+        - google-sheets/list_sheet_tables
+        - memory_save
+        - memory_read
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace

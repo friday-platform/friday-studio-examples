@@ -18,5 +18,17 @@
   {
     "name": "Competitive Monitor",
     "folder": "competitive-monitor"
+  },
+  {
+    "name": "Daily Operating Memo",
+    "folder": "daily-operating-memo"
+  },
+  {
+    "name": "Google Sheets Query",
+    "folder": "google-sheets-query"
+  },
+  {
+    "name": "RTX Price Monitor",
+    "folder": "rtx-price-monitor"
   }
 ]
