@@ -1,12 +1,8 @@
 # PR Reviewer
 
-An on-demand pull request review system that runs in your Friday workspace. Paste a GitHub PR URL, and the reviewer fetches the code, analyzes it for bugs, security issues, and style problems, then posts an inline review directly on the PR — no context-switching, no copy-pasting diffs.
+An on-demand pull request review workspace. Paste a GitHub PR URL in chat, and the reviewer fetches the code, analyzes it for bugs, security issues, and style problems, then posts an inline review directly on the PR.
 
----
-
-## What it does
-
-PR Reviewer gives you a thorough senior-level code review posted directly to GitHub. When triggered, it:
+When triggered, it:
 
 - **Reads the PR** — fetches metadata: title, body, author, base/head branches, and changed files
 - **Reads each changed file** — pulls the current file contents to understand full context, not just the diff
@@ -17,26 +13,6 @@ PR Reviewer gives you a thorough senior-level code review posted directly to Git
   - Code style and maintainability
   - Missing tests or edge cases
 - **Posts an inline GitHub review** — specific comments at the relevant file and line, plus a summary verdict (APPROVE / REQUEST_CHANGES / COMMENT)
-
----
-
-## What the review looks like
-
-The reviewer posts directly to the GitHub PR as a formal review, with:
-
-- Inline comments on specific lines with explanations and suggestions
-- A summary comment with an overall verdict and key findings grouped by severity
-- A clear APPROVE, REQUEST_CHANGES, or COMMENT review state
-
-![PR review summary on GitHub](../assets/github-pr-reviewer/pr-review-summary-on-github.png)
-
----
-
-## How to use it
-
-Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when prompted.
-
-![PR review request in chat](../assets/github-pr-reviewer/chat-pr-review-request.png)
 
 ---
 
@@ -66,6 +42,26 @@ GitHub PR Reviewer uses the GitHub MCP server, which needs a personal access tok
 ### 2. Run your first review
 
 Once GitHub is connected, open the workspace, start a chat, and paste in any PR URL. The reviewer will fetch the code, analyze it, and post the review directly to the PR.
+
+---
+
+## What the review looks like
+
+The reviewer posts directly to the GitHub PR as a formal review, with:
+
+- Inline comments on specific lines with explanations and suggestions
+- A summary comment with an overall verdict and key findings grouped by severity
+- A clear APPROVE, REQUEST_CHANGES, or COMMENT review state
+
+![PR review summary on GitHub](../assets/github-pr-reviewer/pr-review-summary-on-github.png)
+
+---
+
+## How to use it
+
+Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when prompted.
+
+![PR review request in chat](../assets/github-pr-reviewer/chat-pr-review-request.png)
 
 ---
 

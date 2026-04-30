@@ -1,12 +1,8 @@
 # DnD Campaign Manager
 
-An AI-assisted D&D campaign world manager that runs in your Friday workspace. Generate context-aware NPCs, spin up side quests, and log session notes — everything builds on what came before, so your world compounds over time.
+An AI-assisted D&D campaign world manager. Generate context-aware NPCs, spin up side quests, and log session notes — everything builds on what came before, so your world compounds over time.
 
----
-
-## What it does
-
-The DnD Campaign Manager gives your campaign a living memory. No spreadsheet to maintain, no wiki to update after every session. Just describe what you need:
+There's no spreadsheet to maintain, no wiki to update after every session. Just describe what you need:
 
 - **Generate an NPC** — "I need a corrupt harbormaster who's been quietly skimming from Ledger shipments" — and get a full 5e stat block with cross-references to existing characters
 - **Generate a side quest** — "Something that draws the party toward the south quarter warehouse" — woven from NPCs already in the roster
@@ -16,6 +12,12 @@ The DnD Campaign Manager gives your campaign a living memory. No spreadsheet to 
 Every generation reads the current campaign state first. NPCs know about each other. Quests use characters who already exist. The world stays consistent.
 
 ![Session recap with new NPCs, continuity flags, and open threads](../assets/dnd_campaign_manager/session-recap-with-npcs.png)
+
+---
+
+## Setup
+
+Start a chat and share your session notes to seed your campaign history, or jump straight to **Generate NPC** and **Generate Quest** to start populating the world.
 
 ---
 
@@ -36,12 +38,6 @@ Use the jobs directly from the Friday UI, or trigger them via their HTTP signals
 
 **View the roster:**
 > Run it with no prompt for a full world state summary, or ask about a specific character or thread
-
----
-
-## Setup
-
-Start a chat and share your session notes to seed your campaign history, or jump straight to **Generate NPC** and **Generate Quest** to start populating the world.
 
 ---
 

@@ -1,18 +1,32 @@
 # RTX Price Monitor
 
-A GPU price alert system that runs in your Friday workspace. Every hour, it scrapes RTX 5080 listings from major retailers, checks for prices under $1,400, and sends you a Gmail alert if any qualifying listings are found — no browser tab to refresh, no price tracker to log into.
+A GPU price alert workspace. Every hour, it scrapes RTX 5080 listings from major retailers, checks for prices under $1,400, and sends you a Gmail alert if any qualifying listings are found.
 
 > This workspace is set up for RTX 5080s, but it's not hard-coded to them. If you want to track something else — a different GPU, a piece of furniture, concert tickets, whatever — just ask Friday in chat and it will reconfigure the workspace for you.
 
----
-
-## What it does
-
-RTX Price Monitor runs silently in the background, checking four retailers on the hour:
+It checks four retailers on the hour:
 
 - **Best Buy, Newegg, Amazon, B&H Photo** — scraped for current price, availability status, and direct purchase URL, focused specifically on the RTX 5080 (not 5080 Super, not 5090)
 
 If any listing comes back in-stock and under $1,400, you get an email with the retailer, product name, price, availability, and a direct link to buy. If nothing qualifies, nothing is sent.
+
+---
+
+## Setup
+
+### 1. Connect Gmail
+
+1. Go to **MCP Catalog → Gmail**
+2. Under **Credentials**, click **Add one**
+3. Follow the OAuth flow to grant access to your Google account (alerts are sent from and to this account)
+
+### 2. Set your recipient email
+
+1. Go to **Agents > rtx-alert-emailer**
+2. In the agent prompt, find: `[ADD EMAIL RECIPIENT HERE]`
+3. Replace it with your email address
+
+Once both steps are done, the schedule fires automatically at the top of every hour.
 
 ---
 
@@ -43,25 +57,6 @@ If you want to run a check immediately outside the hourly schedule, trigger the 
 ![Triggering an on-demand price check from chat](../assets/rtx-price-monitor/chat-price-check-email-prompt.png)
 
 ![Hourly scheduled runs in the Activity tab](../assets/rtx-price-monitor/activity-tab-hourly-runs.png)
-
----
-
-## Setup
-
-### 1. Connect Gmail
-
-1. Go to **MCP Catalog → Gmail**
-2. Under **Credentials**, click **Add one**
-3. Follow the OAuth flow to grant access to your Google account (alerts are sent from and to this account)
-
-
-### 2. Set your recipient email
-
-1. Go to **Agents > rtx-alert-emailer**
-2. In the agent prompt, find: `[ADD EMAIL RECIPIENT HERE]`
-3. Replace it with your email address
-
-Once both steps are done, the schedule fires automatically at the top of every hour.
 
 ---
 

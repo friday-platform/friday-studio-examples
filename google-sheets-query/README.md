@@ -1,17 +1,27 @@
 # Google Sheets Query
 
-A natural language interface for your Google Sheets data, running in your Friday workspace. Ask questions in plain English and get direct answers — no formula bar to navigate, no pivot tables to build.
+A natural language interface for your Google Sheets data. Ask questions in plain English and get direct answers — no formula bar to navigate, no pivot tables to build.
 
----
-
-## What it does
-
-Google Sheets Query lets you talk to your spreadsheets like a database. Point it at a sheet and ask anything:
+Point it at a sheet and ask anything:
 
 - **List spreadsheets** — if you don't specify one, the agent surfaces what's available
 - **Explore structure** — reads sheet names, ranges, and layout before answering so it understands what it's working with
 - **Read and answer** — pulls the relevant data and responds directly, citing the spreadsheet name, sheet name, and range it used
 - **Remember context** — saves key findings to memory so follow-up questions can reference what was already found
+
+---
+
+## Setup
+
+### Connect Google Sheets
+
+1. Go to **MCP Catalog → Google Sheets**
+2. Under **Credentials**, click **Add one**
+3. Follow the OAuth flow to grant access to your Google account
+
+![Google Sheets entry in the MCP Catalog](../assets/google-sheets-query/mcp-catalog-google-sheets.png)
+
+Once connected, the agent can immediately list and read any spreadsheet your Google account has access to.
 
 ---
 
@@ -39,20 +49,6 @@ To trigger it programmatically or from an external system, POST to the `query-sh
 ```
 
 `spreadsheet` is optional. If omitted, the agent will list available sheets and pick the most relevant one.
-
----
-
-## Setup
-
-### Connect Google Sheets
-
-1. Go to **MCP Catalog → Google Sheets**
-2. Under **Credentials**, click **Add one**
-3. Follow the OAuth flow to grant access to your Google account
-
-![Google Sheets entry in the MCP Catalog](../assets/google-sheets-query/mcp-catalog-google-sheets.png)
-
-Once connected, the agent can immediately list and read any spreadsheet your Google account has access to.
 
 ---
 

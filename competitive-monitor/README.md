@@ -1,12 +1,8 @@
 # Competitive Monitor
 
-A weekly competitor intelligence system that runs in your Friday workspace. Every Monday at 8:00am Pacific, it searches the web for recent product moves, pricing changes, and GTM signals from your tracked competitors, clusters findings by theme, and delivers a sourced brief with verified dates — no dashboard to open, no manual searching.
+A weekly competitor intelligence workspace. Every Monday at 8:00am Pacific, it searches the web for recent product moves, pricing changes, and GTM signals from your tracked competitors, clusters findings by theme, and delivers a sourced brief with verified dates.
 
----
-
-## What it does
-
-Competitive Monitor gives you a single weekly digest of what your competitors have been up to, composed and delivered before your week gets going. Every Monday morning it runs a full web research pass covering the prior 7 days:
+It covers five categories across the prior 7 days:
 
 - **Product** — new features, launches, deprecations
 - **Pricing** — plan changes, discounts, packaging shifts
@@ -15,6 +11,23 @@ Competitive Monitor gives you a single weekly digest of what your competitors ha
 - **Leadership** — executive hires, departures, org changes
 
 Every finding includes what happened, an exact confirmed date, and a direct link to the source article. Findings without a verified date and article URL are dropped — no fabricated dates, no homepage links.
+
+---
+
+## Setup
+
+### Update your competitor list
+
+The default scan targets **Google** and **Facebook**. To change this:
+
+1. Go to **Jobs → Competitive Monitor Weekly Scan**
+2. In the `research` state agent prompt, update the competitors line:
+   `Run a competitive intelligence scan ... on these competitors: Google, Facebook.`
+3. Replace with your actual competitors
+
+You can also override competitors on a per-run basis using the `run-now` signal's `competitors` input field without changing the job config.
+
+![Configuring competitors and focus areas via chat](../assets/competitive-monitor/chat-configure-competitors.png)
 
 ---
 
@@ -41,23 +54,6 @@ If you want to fire it outside the Monday schedule — say, mid-week after a com
 - `lookback_days` — how many days back to search (default: 7, max: 90)
 
 ![Recent run summary in the Activity tab](../assets/competitive-monitor/activity-tab-recent-runs.png)
-
----
-
-## Setup
-
-### Update your competitor list
-
-The default scan targets **Google** and **Facebook**. To change this:
-
-1. Go to **Jobs → Competitive Monitor Weekly Scan**
-2. In the `research` state agent prompt, update the competitors line:
-   `Run a competitive intelligence scan ... on these competitors: Google, Facebook.`
-3. Replace with your actual competitors
-
-You can also override competitors on a per-run basis using the `run-now` signal's `competitors` input field without changing the job config.
-
-![Configuring competitors and focus areas via chat](../assets/competitive-monitor/chat-configure-competitors.png)
 
 ---
 

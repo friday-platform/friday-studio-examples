@@ -1,12 +1,8 @@
 # Inbox Zero
 
-An interactive inbox triage and autopilot system that runs in your Friday workspace. Manually review emails one-by-one with letter-key actions, or let the autopilot run every morning at 8am Pacific — classifying up to 25 unread emails, auto-acting on high-confidence ones, and writing a markdown report so you stay in the loop.
+An interactive inbox triage and autopilot workspace. Manually review emails one-by-one with letter-key actions, or let the autopilot run every morning at 8am Pacific — classifying up to 25 unread emails, auto-acting on high-confidence ones, and writing a markdown report so you stay in the loop.
 
----
-
-## What it does
-
-Inbox Zero gives you two modes for keeping your inbox under control:
+Two modes:
 
 **Interactive Triage** — pull the 10 most recent unread emails and walk through them one at a time. For each email you get a summary card and five actions:
 
@@ -19,6 +15,27 @@ Inbox Zero gives you two modes for keeping your inbox under control:
 After all 10, the workspace saves your triage patterns to the `preferences` memory store. The next time you triage, it reads those preferences back and suggests the likely action next to each email `[suggested]`.
 
 **Autopilot** — runs automatically every day at 8am Pacific. Fetches up to 25 unread emails, classifies each with a confidence score (0.0–1.0), and auto-acts on anything at **0.85 or above**. Emails below that threshold are left untouched and flagged in the report under "Needs Review." After processing, it writes a markdown report to `~/inbox-zero-reports/report-{YYYY-MM-DD-HH-MM}.md` covering every action taken, skipped emails, and any unsubscribe links found.
+
+---
+
+## Setup
+
+### 1. Connect Gmail
+
+The workspace uses your Gmail account both to read emails and to apply label changes (archive, delete, etc.).
+
+1. Go to **Integrations** in the workspace sidebar
+2. Find **Gmail** and click **Connect**
+3. Authenticate with the Google account you want to manage
+
+### 2. Set your email address
+
+Both agents have a placeholder `[INSERT EMAIL RECIPIENT HERE]` in their prompts that tells them which inbox to operate on.
+
+1. Go to **Agents > inbox-reviewer**, find and replace `[INSERT EMAIL RECIPIENT HERE]` with your email address
+2. Go to **Agents > inbox-autopilot**, do the same
+
+Once those two steps are done, both modes are ready.
 
 ---
 
@@ -43,27 +60,6 @@ Type a letter and hit enter. The action fires, the next email loads.
 **Autopilot** — runs automatically every day at 8am Pacific. Nothing to trigger. After each run, a markdown report lands in `~/inbox-zero-reports/`.
 
 If you want to fire the autopilot outside the schedule, trigger the `autopilot-inbox` signal manually from the workspace.
-
----
-
-## Setup
-
-### 1. Connect Gmail
-
-The workspace uses your Gmail account both to read emails and to apply label changes (archive, delete, etc.).
-
-1. Go to **Integrations** in the workspace sidebar
-2. Find **Gmail** and click **Connect**
-3. Authenticate with the Google account you want to manage
-
-### 2. Set your email address
-
-Both agents have a placeholder `[INSERT EMAIL RECIPIENT HERE]` in their prompts that tells them which inbox to operate on.
-
-1. Go to **Agents > inbox-reviewer**, find and replace `[INSERT EMAIL RECIPIENT HERE]` with your email address
-2. Go to **Agents > inbox-autopilot**, do the same
-
-Once those two steps are done, both modes are ready.
 
 ---
 

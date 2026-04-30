@@ -1,43 +1,12 @@
 # GitHub Digest
 
-A scheduled pull request briefing that runs in your Friday workspace. Every Monday and Thursday at 8:30am Pacific, it scans GitHub for your open PRs and pending review requests, synthesizes a clean digest, and surfaces it — no dashboard to open, no GitHub inbox to scan.
-
----
-
-## What it does
-
-GitHub Digest gives you a focused view of your PR workload twice a week. It checks one source on each run:
-
-- **GitHub** — your open pull requests (authored by you, across all repos) and any PRs where you've been requested as a reviewer
+A scheduled pull request briefing workspace. Every Monday and Thursday at 8:30am Pacific, it scans GitHub for your open PRs and pending review requests, and surfaces a clean digest — no dashboard to open, no GitHub inbox to scan.
 
 The digest is organized into three sections:
 
 - **Your Open PRs** — title, repo, URL, age, and current review status (approved / changes requested / awaiting)
 - **Review Requested** — PRs where you're asked to review, with title, repo, URL, and author
 - **Summary** — one sentence on total counts and any urgent items
-
----
-
-## What the digest looks like
-
-> **Your Open PRs**
-> - [Fix auth token refresh](https://github.com/...) — `my-org/api` — 3 days old — awaiting review
->
-> **Review Requested**
-> - [Add rate limiting middleware](https://github.com/...) — `my-org/api` — by @colleague
->
-> **Summary**
-> 1 open PR, 1 review pending. No urgent items.
-
-![PR digest output in chat](../assets/github-digest/chat-pr-digest-output.png)
-
----
-
-## How to use it
-
-It runs automatically. Nothing to trigger, nothing to open.
-
-The digest fires every **Monday and Thursday at 8:30am Pacific** (UTC cron: `30 15 * * 1,4`).
 
 ---
 
@@ -67,6 +36,29 @@ GitHub Digest uses the GitHub MCP server, which needs a personal access token to
 ### 2. That's it
 
 No email recipient to configure, no additional MCP servers to enable. The digest runs against your authenticated GitHub account and outputs directly to the workspace session.
+
+---
+
+## What the digest looks like
+
+> **Your Open PRs**
+> - [Fix auth token refresh](https://github.com/...) — `my-org/api` — 3 days old — awaiting review
+>
+> **Review Requested**
+> - [Add rate limiting middleware](https://github.com/...) — `my-org/api` — by @colleague
+>
+> **Summary**
+> 1 open PR, 1 review pending. No urgent items.
+
+![PR digest output in chat](../assets/github-digest/chat-pr-digest-output.png)
+
+---
+
+## How to use it
+
+It runs automatically. Nothing to trigger, nothing to open.
+
+The digest fires every **Monday and Thursday at 8:30am Pacific** (UTC cron: `30 15 * * 1,4`).
 
 ---
 

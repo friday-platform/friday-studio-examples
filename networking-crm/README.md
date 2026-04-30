@@ -1,12 +1,8 @@
 # Networking CRM
 
-A relationship tracking system that runs in your Friday workspace. Send it a message via Telegram to log an interaction, add context about a contact, ask what you know about someone, or find out who you should be following up with — and it keeps your network warm over time.
+A relationship tracking workspace. Send it a message via Telegram to log an interaction, add context about a contact, ask what you know about someone, or find out who you should be following up with — and it keeps your network warm over time.
 
----
-
-## What it does
-
-Networking CRM gives you a conversational relationship memory built for professional networking. There's no form to fill in, no spreadsheet to maintain. Just message it the way you'd message a colleague:
+There's no form to fill in, no spreadsheet to maintain. Just message it the way you'd message a colleague:
 
 - **Log an interaction** — "Had coffee with James today, he's exploring a new role, follow up in two weeks"
 - **Add context about a contact** — "Sarah just moved to Head of Product at Stripe"
@@ -16,6 +12,19 @@ Networking CRM gives you a conversational relationship memory built for professi
 The assistant stores everything in a narrative memory — contact name, company/role, date, what happened, commitments made, and next follow-up action. It reads that memory to answer questions and proactively suggests who's due for a touchpoint based on relationship context.
 
 ![Logging an interaction and asking for follow-ups in Telegram](../assets/networking-crm/telegram-crm-conversation.png)
+
+---
+
+## Setup
+
+### Connect the Telegram communicator
+
+1. Go to **Overview > Info > Communicators**
+2. Find the Telegram communicator and connect it
+
+![Connecting the Telegram communicator with a bot token](../assets/networking-crm/telegram-communicator-setup.png)
+
+Once connected, messages sent to the linked Telegram bot will trigger the CRM assistant automatically.
 
 ---
 
@@ -34,19 +43,6 @@ Once set up, message the workspace's Telegram bot. No commands, no syntax — pl
 > "Remind me what I need to follow up on."
 
 The assistant will confirm every save, answer questions directly from what's been logged, and flag contacts that need a nudge. It'll also factor in relationship strength when suggesting timing — a warm lead gets a tighter cycle than a casual connection.
-
----
-
-## Setup
-
-### Connect the Telegram communicator
-
-1. Go to **Overview > Info > Communicators**
-2. Find the Telegram communicator and connect it
-
-![Connecting the Telegram communicator with a bot token](../assets/networking-crm/telegram-communicator-setup.png)
-
-Once connected, messages sent to the linked Telegram bot will trigger the CRM assistant automatically.
 
 ---
 
