@@ -61,11 +61,24 @@ That's it. The review is posted to the PR automatically.
 
 ### 1. Connect GitHub
 
-1. Go to **Settings → Integrations**
-2. Find **GitHub** and click **Connect**
-3. Authenticate with the GitHub account that should post the reviews
+GitHub PR Reviewer uses the GitHub MCP server, which needs a personal access token to query your PRs and review requests.
 
-The reviewer posts comments as this account, so make sure it has write access to the repositories you want to review.
+**Generate a token**
+
+1. Go to [github.com/settings/tokens](https://github.com/settings/tokens)
+2. Click **Generate new token (classic)**
+3. Give it a name (e.g. `friday-digest`)
+4. Select the following scopes:
+   - `repo` — to read pull requests across your repos
+   - `read:user` — to resolve your GitHub username automatically
+5. Click **Generate token** and copy it — you won't see it again
+
+**Connect it in Friday**
+
+1. Open the imported workspace and start a chat
+2. Friday will detect that GitHub needs credentials and surface a **Connect GitHub** prompt
+3. Paste your token when asked
+4. You're connected — no further setup needed
 
 ### 2. Trigger a review
 
