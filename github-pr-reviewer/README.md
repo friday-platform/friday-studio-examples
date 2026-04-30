@@ -18,7 +18,19 @@ When triggered, it:
 
 ## Setup
 
-### 1. Connect GitHub
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect GitHub
 
 GitHub PR Reviewer uses the GitHub MCP server, which needs a personal access token to query your PRs and review requests.
 
@@ -39,7 +51,7 @@ GitHub PR Reviewer uses the GitHub MCP server, which needs a personal access tok
 3. Paste your token when asked
 4. You're connected — no further setup needed
 
-### 2. Run your first review
+### 4. Run your first review
 
 Once GitHub is connected, open the workspace, start a chat, and paste in any PR URL. The reviewer will fetch the code, analyze it, and post the review directly to the PR.
 

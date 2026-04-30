@@ -13,7 +13,19 @@ The memo-composer synthesizes those two blocks into a single email with a **Top 
 
 ## Setup
 
-### 1. Connect Google Calendar and Gmail
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect Google Calendar and Gmail
 
 1. Go to **MCP Catalog**
 2. Go to **Gmail**
@@ -21,7 +33,7 @@ The memo-composer synthesizes those two blocks into a single email with a **Top 
 4. Connect your account (the memo is sent from and to this account)
 5. Repeat this for **Google Calendar**
 
-### 2. Set your recipient email
+### 4. Set your recipient email
 
 1. Go to **Agents > memo-composer**
 2. In the agent prompt, find: `[ADD EMAIL RECIPIENT HERE]` (appears twice)

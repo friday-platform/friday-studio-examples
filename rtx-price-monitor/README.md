@@ -14,13 +14,25 @@ If any listing comes back in-stock and under $1,400, you get an email with the r
 
 ## Setup
 
-### 1. Connect Gmail
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect Gmail
 
 1. Go to **MCP Catalog → Gmail**
 2. Under **Credentials**, click **Add one**
 3. Follow the OAuth flow to grant access to your Google account (alerts are sent from and to this account)
 
-### 2. Set your recipient email
+### 4. Set your recipient email
 
 1. Go to **Agents > rtx-alert-emailer**
 2. In the agent prompt, find: `[ADD EMAIL RECIPIENT HERE]`

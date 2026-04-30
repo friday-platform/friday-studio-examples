@@ -12,7 +12,19 @@ The digest is organized into three sections:
 
 ## Setup
 
-### 1. Connect GitHub
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect GitHub
 
 GitHub Digest uses the GitHub MCP server, which needs a personal access token to query your PRs and review requests.
 
@@ -33,7 +45,7 @@ GitHub Digest uses the GitHub MCP server, which needs a personal access token to
 3. Paste your token when asked
 4. You're connected — no further setup needed
 
-### 2. That's it
+### 4. That's it
 
 No email recipient to configure, no additional MCP servers to enable. The digest runs against your authenticated GitHub account and outputs directly to the workspace session.
 

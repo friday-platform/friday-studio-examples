@@ -16,7 +16,19 @@ Every finding includes what happened, an exact confirmed date, and a direct link
 
 ## Setup
 
-### Update your competitor list
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Update your competitor list
 
 The default scan targets **Google** and **Facebook**. To change this:
 

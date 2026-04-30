@@ -17,7 +17,19 @@ The assistant stores everything in a narrative memory — contact name, company/
 
 ## Setup
 
-### Connect the Telegram communicator
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect the Telegram communicator
 
 1. Go to **Overview > Info > Communicators**
 2. Find the Telegram communicator and connect it

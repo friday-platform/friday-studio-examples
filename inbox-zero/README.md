@@ -20,7 +20,19 @@ After all 10, the workspace saves your triage patterns to the `preferences` memo
 
 ## Setup
 
-### 1. Connect Gmail
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
+### 3. Connect Gmail
 
 The workspace uses your Gmail account both to read emails and to apply label changes (archive, delete, etc.).
 
@@ -28,7 +40,7 @@ The workspace uses your Gmail account both to read emails and to apply label cha
 2. Find **Gmail** and click **Connect**
 3. Authenticate with the Google account you want to manage
 
-### 2. Set your email address
+### 4. Set your email address
 
 Both agents have a placeholder `[INSERT EMAIL RECIPIENT HERE]` in their prompts that tells them which inbox to operate on.
 

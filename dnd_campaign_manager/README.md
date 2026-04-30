@@ -17,6 +17,18 @@ Every generation reads the current campaign state first. NPCs know about each ot
 
 ## Setup
 
+### 1. Download Friday
+
+1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
+2. Open the DMG and drag Friday to your Applications folder
+3. Launch Friday and complete the initial setup
+
+### 2. Import the workspace
+
+1. Open Friday and go to **Discover Spaces**
+2. Find this workspace and click it
+3. Click **Add Space**
+
 Start a chat and share your session notes to seed your campaign history, or jump straight to **Generate NPC** and **Generate Quest** to start populating the world.
 
 ---
