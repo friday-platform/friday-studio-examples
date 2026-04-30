@@ -38,7 +38,7 @@ Type a letter and hit enter. The action fires, the next email loads.
 
 ## How to use it
 
-**Interactive triage** — trigger the `triage-inbox` signal from the workspace. You'll be walked through your 10 most recent unreads in this chat.
+**Interactive triage** — trigger the `triage-inbox` signal from the workspace, or just ask in chat to start going through your unreads. Either way, you'll be walked through your 10 most recent unread emails one by one.
 
 **Autopilot** — runs automatically every day at 8am Pacific. Nothing to trigger. After each run, a markdown report lands in `~/inbox-zero-reports/`.
 
