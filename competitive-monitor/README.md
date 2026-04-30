@@ -39,8 +39,6 @@ The default scan targets **Google** and **Facebook**. To change this:
 
 You can also override competitors on a per-run basis using the `run-now` signal's `competitors` input field without changing the job config.
 
-![Configuring competitors and focus areas via chat](../assets/competitive-monitor/chat-configure-competitors.png)
-
 ---
 
 ## What the brief looks like
@@ -50,8 +48,6 @@ Findings are clustered by theme and delivered as a structured report artifact in
 > **What happened**
 > Announced: April 21, 2025
 > Source: [Publication Name](https://specific-article-url)
-
-![Weekly competitive intelligence brief, clustered by competitor and theme with sourced links](../assets/competitive-monitor/weekly-intelligence-brief-output.png)
 
 ---
 
@@ -65,13 +61,11 @@ If you want to fire it outside the Monday schedule — say, mid-week after a com
 - `focus_areas` — limit the scan to specific themes: `pricing`, `product`, `packaging`, `gtm`, `partnerships`, `leadership`
 - `lookback_days` — how many days back to search (default: 7, max: 90)
 
-![Recent run summary in the Activity tab](../assets/competitive-monitor/activity-tab-recent-runs.png)
-
 ---
 
 ## How it works
 
-![Competitive Monitor workspace overview in Friday](../assets/competitive-monitor/info-tab-jobs-signals-communicators.png)
+![Competitive Monitor workspace overview in Friday](../assets/competitive-monitor/info-tab-workspace-overview.png)
 
 | Component | Role |
 |---|---|
