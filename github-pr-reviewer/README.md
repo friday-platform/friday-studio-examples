@@ -34,26 +34,9 @@ The reviewer posts directly to the GitHub PR as a formal review, with:
 
 ## How to use it
 
-**Option 1: From the workspace**
-
 Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when prompted.
 
 ![PR review request in chat](../assets/github-pr-reviewer/chat-pr-review-request.png)
-
-**Option 2: Via HTTP**
-
-Send a POST to the signal endpoint:
-
-```bash
-POST /review-pr
-Content-Type: application/json
-
-{
-  "pr_url": "https://github.com/owner/repo/pull/123"
-}
-```
-
-That's it. The review is posted to the PR automatically.
 
 ---
 
@@ -80,9 +63,9 @@ GitHub PR Reviewer uses the GitHub MCP server, which needs a personal access tok
 3. Paste your token when asked
 4. You're connected — no further setup needed
 
-### 2. Trigger a review
+### 2. Run your first review
 
-Once GitHub is connected, trigger the `review-pr` signal with any public or accessible PR URL.
+Once GitHub is connected, open the workspace, start a chat, and paste in any PR URL. The reviewer will fetch the code, analyze it, and post the review directly to the PR.
 
 ---
 
