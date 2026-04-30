@@ -65,7 +65,7 @@ If you want to fire it outside the Monday schedule — say, mid-week after a com
 
 ## How it works
 
-![Competitive Monitor workspace overview in Friday](../assets/competitive-monitor/info-tab-workspace-overview.png)
+![Competitive Monitor workspace overview in Friday](../assets/competitive-monitor/workspace-overview.png)
 
 | Component | Role |
 |---|---|
