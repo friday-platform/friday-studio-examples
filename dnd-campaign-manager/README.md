@@ -13,7 +13,7 @@ Every generation reads the current campaign state first. NPCs know about each ot
 
 ---
 
-![dnd_campaign_manager output](../assets/dnd_campaign_manager/output.png)
+![dnd-campaign-manager output](../assets/dnd-campaign-manager/output.png)
 
 ---
 
@@ -55,7 +55,7 @@ Use the jobs directly from the Friday UI, or trigger them via their HTTP signals
 
 ## How it works
 
-![dnd_campaign_manager workspace overview in Friday](../assets/dnd_campaign_manager/how-it-works.png)
+![dnd-campaign-manager workspace overview in Friday](../assets/dnd-campaign-manager/how-it-works.png)
 
 | Component | Role |
 |---|---|

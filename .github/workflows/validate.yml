@@ -24,3 +24,37 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v23
         with:
           globs: "**/*.md"
+
+  folder-names:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Enforce kebab-case example folders
+        run: |
+          set -euo pipefail
+          pattern='^[a-z0-9]+(-[a-z0-9]+)*$'
+          fail=0
+          check() {
+            local dir=$1
+            for entry in "$dir"/*/; do
+              [ -d "$entry" ] || continue
+              name=$(basename "$entry")
+              if ! [[ $name =~ $pattern ]]; then
+                echo "::error file=$entry::Folder '$name' must be kebab-case (see CONTRIBUTING.md)"
+                fail=1
+              fi
+            done
+          }
+          # Example workspaces live at the repo root; their assets mirror the name.
+          for entry in */; do
+            name=$(basename "$entry")
+            case $name in
+              .github|.claude|.git|assets|site|node_modules) continue ;;
+            esac
+            if ! [[ $name =~ $pattern ]]; then
+              echo "::error file=$entry::Folder '$name' must be kebab-case (see CONTRIBUTING.md)"
+              fail=1
+            fi
+          done
+          [ -d assets ] && check assets
+          exit $fail
