@@ -13,6 +13,10 @@ The assistant stores everything in a narrative memory — contact name, company/
 
 ---
 
+![networking-crm output](../assets/networking-crm/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

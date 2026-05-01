@@ -14,6 +14,10 @@ Every finding includes what happened, an exact confirmed date, and a direct link
 
 ---
 
+![competitive-monitor output](../assets/competitive-monitor/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

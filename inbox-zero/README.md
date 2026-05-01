@@ -18,6 +18,10 @@ After all 10, the workspace saves your triage patterns to the `preferences` memo
 
 ---
 
+![inbox-zero output](../assets/inbox-zero/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

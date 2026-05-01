@@ -11,6 +11,10 @@ Point it at a sheet and ask anything:
 
 ---
 
+![google-sheets-query output](../assets/google-sheets-query/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

@@ -10,6 +10,10 @@ The digest is organized into three sections:
 
 ---
 
+![github-digest output](../assets/github-digest/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

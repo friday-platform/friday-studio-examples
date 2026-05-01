@@ -13,6 +13,10 @@ Every generation reads the current campaign state first. NPCs know about each ot
 
 ---
 
+![dnd_campaign_manager output](../assets/dnd_campaign_manager/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

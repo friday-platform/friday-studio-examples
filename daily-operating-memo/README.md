@@ -11,6 +11,10 @@ The memo-composer synthesizes those two blocks into a single email with a **Top 
 
 ---
 
+![daily-operating-memo output](../assets/daily-operating-memo/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

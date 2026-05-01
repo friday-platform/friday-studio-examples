@@ -16,6 +16,10 @@ When triggered, it:
 
 ---
 
+![github-pr-reviewer output](../assets/github-pr-reviewer/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday

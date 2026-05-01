@@ -12,6 +12,10 @@ If any listing comes back in-stock and under $1,400, you get an email with the r
 
 ---
 
+![rtx-price-monitor output](../assets/rtx-price-monitor/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday
