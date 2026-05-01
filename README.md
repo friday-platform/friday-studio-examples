@@ -23,7 +23,7 @@ Each example is a complete workspace you can read end-to-end: a single `workspac
 | [RTX Price Monitor](rtx-price-monitor) | Hourly GPU price scraper that emails you when an RTX 5080 drops under your threshold |
 | [DnD Campaign Manager](dnd-campaign-manager) | Persistent campaign state for tabletop RPG sessions — NPCs, locations, plot threads tracked across sessions |
 
-> **First time?** Start with [GitHub Digest](github-digest) — one credential, runs on a schedule, results in your inbox in five minutes.
+> **First time?** Start with [GitHub Digest](github-digest) — one credential, runs on a schedule, digest lands in your workspace twice a week.
 
 ## Getting started
 

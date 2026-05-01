@@ -83,7 +83,7 @@ Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when p
 
 | Component | Role |
 |---|---|
-| `pr-reviewer` agent | LLM agent (Claude Opus 4.5) that reads the PR, analyzes changes, and posts the inline review |
+| `pr-reviewer` agent | LLM agent (Claude Opus 4.6) that reads the PR, analyzes changes, and posts the inline review |
 | `review-pr-job` job | Single-state FSM that runs the `pr-reviewer` agent with the provided PR URL |
 | `review-pr` signal | HTTP signal that accepts a `pr_url` and starts the review job |
 | `github` MCP server | Provides PR read, file contents, review write, and comment tools |
@@ -104,7 +104,7 @@ The `review-pr` HTTP signal fires the `review-pr-job` FSM, which immediately run
 
 ## Notes
 
-- The reviewer uses **Claude Opus 4.5** at temperature 0.3 — thorough and consistent, not creative.
+- The reviewer uses **Claude Opus 4.6** at temperature 0.3 — thorough and consistent, not creative.
 - It reads full file contents, not just the diff, so it can spot issues that only make sense in context.
 - Reviews are posted under the GitHub account you connected — make sure that account has write access to the repo.
 - The reviewer will not invent findings. If the code looks clean, it says so and approves.
