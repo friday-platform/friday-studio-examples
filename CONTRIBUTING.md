@@ -17,7 +17,7 @@ Every example must follow the same shape so the catalog stays browsable.
 
 Use **kebab-case** for the folder name (e.g. `meeting-notes-summarizer`, not `meeting_notes_summarizer` or `MeetingNotesSummarizer`).
 
-```
+```text
 my-new-example/
 ├── workspace.yml
 ├── workspace.lock

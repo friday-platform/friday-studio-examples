@@ -1,0 +1,26 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run yamllint
+        uses: karancode/yamllint-github-action@v3.0.0
+        with:
+          yamllint_strict: true
+          yamllint_config_filepath: .yamllint.yml
+
+  markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: "**/*.md"

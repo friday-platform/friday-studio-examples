@@ -58,9 +58,11 @@ No email recipient to configure, no additional MCP servers to enable. The digest
 ## What the digest looks like
 
 > **Your Open PRs**
+>
 > - [Fix auth token refresh](https://github.com/...) — `my-org/api` — 3 days old — awaiting review
 >
 > **Review Requested**
+>
 > - [Add rate limiting middleware](https://github.com/...) — `my-org/api` — by @colleague
 >
 > **Summary**

@@ -30,7 +30,7 @@ If you'd rather work from a local checkout — e.g. to edit a workspace before i
 
 ## Repository layout
 
-```
+```text
 .
 ├── <example-name>/
 │   ├── workspace.yml      # signals, jobs, agents, memory, MCP servers
