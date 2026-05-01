@@ -6,7 +6,12 @@ If you discover a security vulnerability in any of the workspace examples in thi
 
 **Please do not open a public GitHub issue for security reports.**
 
-Email security reports to **security@hellofriday.ai** with:
+You can report privately in either of two ways:
+
+- **GitHub private vulnerability reporting** (preferred) — open an advisory at [github.com/friday-platform/friday-studio-examples/security/advisories/new](https://github.com/friday-platform/friday-studio-examples/security/advisories/new). The report stays private until we publish it.
+- **Email** — send the details to **security@hellofriday.ai**.
+
+Either way, please include:
 
 - A description of the issue and the example(s) affected
 - Steps to reproduce, or a proof of concept
