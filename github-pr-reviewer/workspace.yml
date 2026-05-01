@@ -1,6 +1,6 @@
 version: '1.0'
 workspace:
-  name: PR Reviewer
+  name: GitHub PR Reviewer
   description: Reviews GitHub pull requests on demand and posts inline findings
 tools:
   mcp:
@@ -55,6 +55,12 @@ jobs:
                 Review this pull request and post an inline GitHub review with your findings.
 
                 pr_url: {{ signal.data.pr_url }}
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
           type: final
 agents:
   pr-reviewer:

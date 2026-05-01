@@ -52,7 +52,7 @@ jobs:
           for entry in */; do
             name=$(basename "$entry")
             case $name in
-              .github|.claude|.git|assets|site|node_modules) continue ;;
+              .github|.claude|.git|assets|site|node_modules|scripts) continue ;;
             esac
             if ! [[ $name =~ $pattern ]]; then
               echo "::error file=$entry::Folder '$name' must be kebab-case (see CONTRIBUTING.md)"
@@ -61,3 +61,15 @@ jobs:
           done
           [ -d assets ] && check assets
           exit $fail
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install --quiet pyyaml
+      - name: Validate examples.json + workspace.yml structure
+        run: python3 scripts/validate_examples.py

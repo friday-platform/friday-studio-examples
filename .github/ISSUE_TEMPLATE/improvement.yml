@@ -1,0 +1,54 @@
+name: Improvement to an existing example
+description: Better prompts, missing screenshots, clearer setup steps, dead links, etc.
+title: "[improve] <example-name>: <short summary>"
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: example
+    attributes:
+      label: Which example?
+      options:
+        - competitive-monitor
+        - daily-operating-memo
+        - dnd-campaign-manager
+        - github-digest
+        - github-pr-reviewer
+        - google-sheets-query
+        - inbox-zero
+        - networking-crm
+        - rtx-price-monitor
+        - repo-wide (README, CONTRIBUTING, CI, etc.)
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of improvement?
+      options:
+        - Prompt quality (clearer, better defaults, fewer hallucinations)
+        - Setup instructions (missing steps, wrong UI path, unclear scopes)
+        - Screenshots (missing, outdated, low quality)
+        - Workspace structure (FSM, signals, memory, MCP wiring)
+        - Documentation (typos, dead links, jargon)
+        - Other (describe below)
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: What is the example doing today that should change?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed change
+      description: What would you change, and what's the expected outcome?
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Links, screenshots, prior art, etc.

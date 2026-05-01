@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/friday-platform/friday-studio-examples/security/advisories/new
+    about: Report a vulnerability privately via GitHub Security Advisories. See SECURITY.md.
+  - name: Friday product support
+    url: https://hellofriday.ai
+    about: Issues with the Friday desktop app itself (crashes, install, sign-in) — please use product support, not this repo.
+  - name: Friday documentation
+    url: https://docs.hellofriday.ai
+    about: Docs about workspace.yml syntax, signals, jobs, agents, and MCP servers.

@@ -1,0 +1,85 @@
+name: Propose a new example
+description: Suggest a new workspace to add to the catalog.
+title: "[new example] <short name>"
+labels: ["new-example"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this to propose a new example workspace. If you already have a working `workspace.yml`, you can skip this and open a PR directly — see [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md).
+  - type: input
+    id: name
+    attributes:
+      label: Example name
+      description: Human-readable title (will appear in `examples.json`).
+      placeholder: "e.g. Slack Standup Bot"
+    validations:
+      required: true
+  - type: input
+    id: folder
+    attributes:
+      label: Folder name
+      description: kebab-case, will live at the repo root.
+      placeholder: "e.g. slack-standup-bot"
+    validations:
+      required: true
+  - type: textarea
+    id: what-it-does
+    attributes:
+      label: What does it do?
+      description: One paragraph. Treat this as the README's opening sentence.
+    validations:
+      required: true
+  - type: dropdown
+    id: trigger
+    attributes:
+      label: What triggers it?
+      multiple: true
+      options:
+        - Schedule (cron)
+        - HTTP signal (manual or external)
+        - Calendar event
+        - Email arrival
+        - Other (describe below)
+    validations:
+      required: true
+  - type: textarea
+    id: integrations
+    attributes:
+      label: Integrations / MCP servers needed
+      description: |
+        Which MCP servers, OAuth providers, or external APIs does this need? Note anything that requires a paid account.
+      placeholder: |
+        - GitHub MCP (PAT with `repo`, `read:user`)
+        - Slack workspace (Bot Token Scope: `chat:write`)
+    validations:
+      required: true
+  - type: textarea
+    id: agents
+    attributes:
+      label: Agents involved
+      description: |
+        How many agents, what kind (LLM, atlas web, atlas calendar, custom), and what each does.
+      placeholder: |
+        - `standup-collector` — LLM (Sonnet) — pulls open PRs, formats Markdown digest
+        - `standup-poster` — LLM (Haiku) — posts to Slack
+    validations:
+      required: true
+  - type: textarea
+    id: why-useful
+    attributes:
+      label: Why would a stranger find this useful?
+      description: What real workflow does this replace? Be concrete.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Pre-flight checks
+      options:
+        - label: This isn't already covered by an existing example.
+          required: true
+        - label: I'll use synthetic / non-real data in screenshots.
+          required: true
+        - label: I'm willing to send a PR (or want help getting started).
+          required: false

@@ -1,0 +1,83 @@
+name: Bug in an example
+description: An example workspace doesn't import, doesn't run, or produces wrong output.
+title: "[bug] <example-name>: <short summary>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please fill in the fields below so we can reproduce it.
+        For bugs in **Friday Studio itself** (not in an example), please use product support at https://hellofriday.ai.
+  - type: dropdown
+    id: example
+    attributes:
+      label: Which example?
+      description: Pick the example folder that's broken.
+      options:
+        - competitive-monitor
+        - daily-operating-memo
+        - dnd-campaign-manager
+        - github-digest
+        - github-pr-reviewer
+        - google-sheets-query
+        - inbox-zero
+        - networking-crm
+        - rtx-price-monitor
+        - other / new (note in description)
+    validations:
+      required: true
+  - type: input
+    id: friday-version
+    attributes:
+      label: Friday Studio version
+      description: From Friday → About, or the installer filename.
+      placeholder: "e.g. 0.42.1"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: macOS version
+      placeholder: "e.g. macOS 15.2 (Sequoia)"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you observe? Include error messages from the Friday Activity tab or logs if available.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Numbered steps from a clean state. Include the trigger you fired (signal name, manual run, etc.).
+      placeholder: |
+        1. Import `github-digest` from local folder
+        2. Connect GitHub PAT with scopes `repo`, `read:user`
+        3. Trigger the `github-digest-schedule` signal manually
+        4. Observe the agent fails at step ...
+    validations:
+      required: true
+  - type: textarea
+    id: workspace-changes
+    attributes:
+      label: Did you modify the workspace?
+      description: If you edited workspace.yml or swapped models/MCP servers, paste the diff or describe the change. If unmodified, say "unmodified".
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / screenshots
+      description: |
+        Paste agent run output, Activity-tab errors, or screenshots. **Redact any tokens, emails, or personal data first.**
+      render: shell

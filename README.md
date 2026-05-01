@@ -3,9 +3,11 @@
 [![Validate](https://github.com/friday-platform/friday-studio-examples/actions/workflows/validate.yml/badge.svg)](https://github.com/friday-platform/friday-studio-examples/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A collection of ready-to-import workspace examples for [Friday](https://hellofriday.ai) — a desktop platform for building agentic workspaces that run on a schedule, react to signals, and stitch together LLMs, MCP servers, and your tools.
+A collection of ready-to-import workspace examples for [Friday Studio](https://hellofriday.ai) — a macOS desktop app for building **agentic workspaces** that run on a schedule, react to signals, and stitch together LLMs, MCP servers, and your tools.
 
-Each example is a complete workspace: a `workspace.yml` describing signals, jobs, agents, and memory, plus a README explaining what it does, how to set it up, and what it looks like in action.
+Each example is a complete workspace you can read end-to-end: a single `workspace.yml` declaring signals, jobs, agents, and memory; a `workspace.lock` pinning versions; a README explaining setup; and screenshots of it running. Browse the folders directly in this repo — every example is meant to be readable as source.
+
+> **What is a Friday Studio workspace?** A YAML-defined unit that bundles one or more *signals* (cron schedules, HTTP triggers, calendar events), *jobs* (FSMs that run when a signal fires), *agents* (LLM, atlas web/calendar, or custom), *memory* stores, and *MCP servers* it talks to. The Friday desktop app imports a `workspace.yml`, materializes the agents, and runs them locally.
 
 ## Examples
 
@@ -23,13 +25,40 @@ Each example is a complete workspace: a `workspace.yml` describing signals, jobs
 
 ## Getting started
 
-You don't need to clone this repo to use the examples. The fastest path is to import them from inside the Friday app.
+Pick the path that fits what you're here to do.
 
-1. **Install Friday.** Download the macOS installer from [hellofriday.ai](https://hellofriday.ai), drag to Applications, and complete the initial setup.
-2. **Open Discover Spaces** in Friday. Browse the catalog, find the example you want, and click **Add Space**.
-3. **Configure credentials.** Most examples need at least one connection (GitHub PAT, Google OAuth, etc.). The per-example README walks through what's needed.
+### Read the source
 
-If you'd rather work from a local checkout — e.g. to edit a workspace before importing, or to base a new workspace on an existing one — clone this repo, edit the `workspace.yml`, and import it via Friday's local-workspace import flow.
+Every example is a single `workspace.yml` plus a README. Open one and read top to bottom — this is the fastest way to learn what a Friday workspace looks like and how to write your own.
+
+```sh
+git clone https://github.com/friday-platform/friday-studio-examples.git
+cd friday-studio-examples/github-digest
+$EDITOR workspace.yml README.md
+```
+
+Good starting points:
+
+- [`github-digest/workspace.yml`](github-digest/workspace.yml) — minimal scheduled job with one LLM agent and one MCP server
+- [`competitive-monitor/workspace.yml`](competitive-monitor/workspace.yml) — atlas web agent + multi-step research pipeline
+- [`networking-crm/workspace.yml`](networking-crm/workspace.yml) — Telegram-driven interactive workspace with persistent memory
+
+### Run an example locally
+
+You'll need [Friday Studio](https://hellofriday.ai) installed (macOS).
+
+1. Clone this repo: `git clone https://github.com/friday-platform/friday-studio-examples.git`
+2. In Friday, choose **Import workspace from folder** and point it at one of the example directories (e.g. `friday-studio-examples/github-digest`).
+3. Connect credentials when prompted (GitHub PAT, Google OAuth, etc.). The per-example README documents what's needed and which scopes.
+4. Trigger the workspace — most examples have either a schedule, an HTTP signal, or a manual `run-now` button in the Friday UI.
+
+If you'd rather skip the clone, the same examples are available inside Friday under **Discover Spaces** — click any example to import it directly.
+
+### Write your own
+
+1. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the example template, naming conventions, and PR checklist.
+2. Copy the closest existing example as a starting point.
+3. Edit the `workspace.yml`, drop screenshots in `assets/<name>/`, register in `examples.json`, and open a PR.
 
 ## Repository layout
 

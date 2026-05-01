@@ -55,7 +55,7 @@ signals:
     config:
       path: /dnd/log-session
 jobs:
-  generate_npc:
+  generate-npc:
     description: >-
       Reads the existing campaign roster and generates a new context-aware NPC with a full 5e stat
       block and cross-references.
@@ -81,7 +81,7 @@ jobs:
               target: done
         done:
           type: final
-  generate_quest:
+  generate-quest:
     description: Reads the existing NPC roster and generates a side quest using real campaign characters.
     title: Generate Quest
     triggers:
@@ -105,7 +105,7 @@ jobs:
               target: done
         done:
           type: final
-  view_roster:
+  view-roster:
     description: Displays the full campaign NPC and quest roster with a world state summary.
     title: View Roster
     triggers:
@@ -129,7 +129,7 @@ jobs:
               target: done
         done:
           type: final
-  log_session:
+  log-session:
     description: 'Processes freeform session notes, updates NPC records, and saves a session summary to memory.'
     title: Log Session
     triggers:
