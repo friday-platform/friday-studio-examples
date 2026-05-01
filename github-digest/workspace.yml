@@ -60,7 +60,7 @@ agents:
     type: llm
     config:
       provider: anthropic
-      model: claude-opus-4-5
+      model: claude-sonnet-4-6
       prompt: >-
         You are a GitHub digest assistant. Your task:
 

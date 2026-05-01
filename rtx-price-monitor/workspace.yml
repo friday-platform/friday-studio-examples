@@ -96,7 +96,7 @@ agents:
     type: llm
     config:
       provider: anthropic
-      model: claude-sonnet-4-5
+      model: claude-sonnet-4-6
       prompt: >-
         You have received RTX 5080 price data from a scraper. Review the data and send an email ONLY
         if any listing shows a price under $1400 AND is in stock or available.

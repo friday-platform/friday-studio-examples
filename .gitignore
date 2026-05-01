@@ -1,1 +1,23 @@
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Secrets / credentials — never commit
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+
+# Language artifacts
+node_modules/
+__pycache__/
+*.pyc
+*.log

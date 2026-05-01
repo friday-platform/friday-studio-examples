@@ -60,7 +60,7 @@ agents:
     type: llm
     config:
       provider: anthropic
-      model: claude-sonnet-4-5
+      model: claude-sonnet-4-6
       prompt: >-
         You are a networking CRM assistant. Your job is to help the user maintain and grow their
         professional relationships. You track interactions, surface who needs a follow-up, and help
