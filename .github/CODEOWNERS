@@ -1,0 +1,11 @@
+# Default reviewers for any change
+* @friday-platform/maintainers
+
+# Sensitive paths require explicit owner review
+/.github/             @friday-platform/maintainers
+/.github/workflows/   @friday-platform/maintainers
+/scripts/             @friday-platform/maintainers
+/SECURITY.md          @friday-platform/maintainers
+/CODE_OF_CONDUCT.md   @friday-platform/maintainers
+/LICENSE              @friday-platform/maintainers
+/examples.json        @friday-platform/maintainers
