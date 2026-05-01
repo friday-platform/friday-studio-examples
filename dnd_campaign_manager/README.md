@@ -51,6 +51,8 @@ Use the jobs directly from the Friday UI, or trigger them via their HTTP signals
 
 ## How it works
 
+![dnd_campaign_manager workspace overview in Friday](../assets/dnd_campaign_manager/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `npc-generator` agent | Reads roster memory, generates a new NPC with full 5e stat block and campaign cross-references |

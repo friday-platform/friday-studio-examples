@@ -73,6 +73,8 @@ If you want to fire it outside the schedule — say, mid-afternoon for a second 
 
 ## How it works
 
+![daily-operating-memo workspace overview in Friday](../assets/daily-operating-memo/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `calendar-fetcher` agent | LLM agent (Claude Haiku) that fetches today's full calendar window in local timezone |

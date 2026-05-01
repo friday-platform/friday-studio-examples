@@ -75,6 +75,8 @@ Trigger the `review-pr` signal from the Friday UI and paste in the PR URL when p
 
 ## How it works
 
+![github-pr-reviewer workspace overview in Friday](../assets/github-pr-reviewer/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `pr-reviewer` agent | LLM agent (Claude Opus 4.5) that reads the PR, analyzes changes, and posts the inline review |

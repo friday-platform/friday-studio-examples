@@ -62,6 +62,8 @@ To trigger it programmatically or from an external system, POST to the `query-sh
 
 ## How it works
 
+![google-sheets-query workspace overview in Friday](../assets/google-sheets-query/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `sheets-query-agent` | LLM agent (Claude Sonnet) that lists, explores, and reads spreadsheets, then answers the question |

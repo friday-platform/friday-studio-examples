@@ -68,6 +68,8 @@ If you want to run a check immediately outside the hourly schedule, trigger the 
 
 ## How it works
 
+![rtx-price-monitor workspace overview in Friday](../assets/rtx-price-monitor/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `rtx-price-scraper` agent | Bundled web agent that searches Best Buy, Newegg, Amazon, and B&H for current RTX 5080 listings and returns structured price data |

@@ -56,6 +56,8 @@ The assistant will confirm every save, answer questions directly from what's bee
 
 ## How it works
 
+![networking-crm workspace overview in Friday](../assets/networking-crm/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `crm-assistant` agent | LLM agent (Claude Sonnet) that reads and writes relationship memory |

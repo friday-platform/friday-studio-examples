@@ -65,6 +65,8 @@ If you want to fire it outside the Monday schedule — say, mid-week after a com
 
 ## How it works
 
+![competitive-monitor workspace overview in Friday](../assets/competitive-monitor/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `competitive-analyst` agent | Atlas web agent that searches the web, visits source pages to verify dates and URLs, and produces a clustered intelligence brief |

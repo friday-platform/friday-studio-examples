@@ -77,6 +77,8 @@ If you want to fire the autopilot outside the schedule, trigger the `autopilot-i
 
 ## How it works
 
+![inbox-zero workspace overview in Friday](../assets/inbox-zero/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `inbox-reviewer` agent | LLM agent (Claude Sonnet) that fetches your 10 most recent unreads, presents each with a summary card, applies your chosen action, and saves preference patterns to memory |

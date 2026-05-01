@@ -74,6 +74,8 @@ The digest fires every **Monday and Thursday at 8:30am Pacific** (cron: `30 8 * 
 
 ## How it works
 
+![github-digest workspace overview in Friday](../assets/github-digest/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `github-digest-agent` | LLM agent (Claude Opus) that queries GitHub for your open PRs and review requests, then formats a Markdown digest |
