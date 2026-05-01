@@ -26,8 +26,8 @@ signals:
     description: 'Fires every Monday and Thursday at 8:30am Pacific'
     provider: schedule
     config:
-      schedule: '30 15 * * 1,4'
-      timezone: UTC
+      schedule: '30 8 * * 1,4'
+      timezone: America/Los_Angeles
 jobs:
   github-digest-job:
     description: 'Every Monday and Thursday: summarize open PRs and review requests for the GitHub user'

@@ -79,7 +79,7 @@ If you want to run a check immediately outside the hourly schedule, trigger the 
 | `rtx-price-scraper` agent | Bundled web agent that searches Best Buy, Newegg, Amazon, and B&H for current RTX 5080 listings and returns structured price data |
 | `rtx-alert-emailer` agent | LLM agent (Claude Sonnet) that reviews the scraped data and sends a Gmail alert if any listing is under $1,400 and in stock |
 | `rtx-price-monitor` job | Two-state FSM: scrape prices → evaluate and alert |
-| `rtx-price-check-cron` signal | Schedule signal firing at `0 * * * *` (top of every hour, Mountain Time) |
+| `rtx-price-check-cron` signal | Schedule signal firing at `0 * * * *` in `America/Los_Angeles` (top of every hour, Pacific) |
 | `google-gmail` MCP server | Provides `send_gmail_message` for outbound alerts |
 
 The cron signal fires the `rtx-price-monitor` FSM. The FSM runs the scraper first, passes its output to the emailer, and the emailer decides whether to send — or stays silent if nothing qualifies.

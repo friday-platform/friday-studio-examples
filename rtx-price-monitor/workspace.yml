@@ -43,7 +43,7 @@ signals:
     provider: schedule
     config:
       schedule: 0 * * * *
-      timezone: America/Denver
+      timezone: America/Los_Angeles
 jobs:
   rtx-price-monitor:
     description: Scrapes RTX 5080 prices hourly and emails you if any are under $1400
@@ -105,7 +105,7 @@ agents:
         If qualifying listings are found, call the google-gmail/send_gmail_message tool to send an
         email with:
 
-        - to: [ADD EMAIL RECIPIENT HERE]
+        - to: "[ADD EMAIL RECIPIENT HERE]"
 
         - subject: RTX 5080 Alert: Sub-$1400 listing found!
 

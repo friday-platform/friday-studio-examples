@@ -70,7 +70,7 @@ No email recipient to configure, no additional MCP servers to enable. The digest
 
 It runs automatically. Nothing to trigger, nothing to open.
 
-The digest fires every **Monday and Thursday at 8:30am Pacific** (UTC cron: `30 15 * * 1,4`).
+The digest fires every **Monday and Thursday at 8:30am Pacific** (cron: `30 8 * * 1,4` in `America/Los_Angeles`).
 
 ---
 
@@ -80,7 +80,7 @@ The digest fires every **Monday and Thursday at 8:30am Pacific** (UTC cron: `30 
 |---|---|
 | `github-digest-agent` | LLM agent (Claude Opus) that queries GitHub for your open PRs and review requests, then formats a Markdown digest |
 | `github-digest-job` | Three-state FSM: idle → run agent → done |
-| `github-digest-schedule` | Schedule signal firing at `30 15 * * 1,4` (8:30am Pacific, Monday and Thursday) |
+| `github-digest-schedule` | Schedule signal firing at `30 8 * * 1,4` in `America/Los_Angeles` (8:30am Pacific, Monday and Thursday) |
 | `github` MCP server | Provides `get_me`, `search_pull_requests`, and `pull_request_read` tools |
 
 The schedule fires the `github-digest-schedule` signal, which starts the `github-digest-job` FSM. The FSM runs `github-digest-agent` in a single step, which calls GitHub MCP tools in sequence — get the authenticated user, search authored PRs, search review-requested PRs — then renders the digest and stores it in `digest-result`.
@@ -91,5 +91,5 @@ The schedule fires the `github-digest-schedule` signal, which starts the `github
 
 - The agent calls `get_me` first to resolve your GitHub login dynamically — no hardcoded username required.
 - If a section is empty (no open PRs, no review requests), the agent says so explicitly rather than omitting it.
-- The schedule uses UTC (`30 15 * * 1,4`) which corresponds to 8:30am America/Los_Angeles (Pacific Standard Time). During daylight saving time this shifts to 8:30am PDT — no adjustment needed.
+- The schedule is configured in `America/Los_Angeles` so it fires at 8:30am Pacific year-round, automatically adjusting for daylight saving time. To change it, edit the `timezone` and `schedule` fields under `signals.github-digest-schedule.config` in `workspace.yml`.
 - All data stays within your Friday workspace and GitHub OAuth session.
