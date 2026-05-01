@@ -1,5 +1,8 @@
 # Friday Studio Examples
 
+[![Validate](https://github.com/friday-platform/friday-studio-examples/actions/workflows/validate.yml/badge.svg)](https://github.com/friday-platform/friday-studio-examples/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A collection of ready-to-import workspace examples for [Friday](https://hellofriday.ai) — a desktop platform for building agentic workspaces that run on a schedule, react to signals, and stitch together LLMs, MCP servers, and your tools.
 
 Each example is a complete workspace: a `workspace.yml` describing signals, jobs, agents, and memory, plus a README explaining what it does, how to set it up, and what it looks like in action.
