@@ -39,8 +39,6 @@ The memo-composer synthesizes those two blocks into a single email with a **Top 
 2. In the agent prompt, find: `[ADD EMAIL RECIPIENT HERE]` (appears twice)
 3. Replace both instances with your email address
 
-![memo-composer agent prompt with the recipient placeholder](../assets/daily-operating-memo/memo-composer-skill-config.png)
-
 Once both steps are done, the schedule will fire automatically on the next weekday at 7:30am Pacific.
 
 ---
@@ -63,8 +61,6 @@ Once both steps are done, the schedule will fire automatically on the next weekd
 > **📬 EMAIL PRIORITIES**
 > ...
 
-![Daily operating memo email delivered to your inbox](../assets/daily-operating-memo/daily-memo-email-output.png)
-
 ---
 
 ## How to use it
@@ -72,8 +68,6 @@ Once both steps are done, the schedule will fire automatically on the next weekd
 It runs automatically. Nothing to trigger, nothing to open.
 
 If you want to fire it outside the schedule — say, mid-afternoon for a second look — trigger the `run-daily-memo` signal from the workspace.
-
-![Triggering the memo from chat for a same-day rerun](../assets/daily-operating-memo/chat-daily-memo-summary.png)
 
 ---
 

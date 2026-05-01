@@ -11,8 +11,6 @@ There's no spreadsheet to maintain, no wiki to update after every session. Just 
 
 Every generation reads the current campaign state first. NPCs know about each other. Quests use characters who already exist. The world stays consistent.
 
-![Session recap with new NPCs, continuity flags, and open threads](../assets/dnd_campaign_manager/session-recap-with-npcs.png)
-
 ---
 
 ## Setup
@@ -46,16 +44,12 @@ Use the jobs directly from the Friday UI, or trigger them via their HTTP signals
 **Log a session:**
 > Paste your raw notes — who showed up, what was invented on the fly, what the party did — and the system handles the rest
 
-![Pasting raw session notes into chat](../assets/dnd_campaign_manager/chat-log-session-input.png)
-
 **View the roster:**
 > Run it with no prompt for a full world state summary, or ask about a specific character or thread
 
 ---
 
 ## How it works
-
-![DnD Campaign Manager workspace overview in Friday](../assets/dnd_campaign_manager/info-tab-jobs-signals.png)
 
 | Component | Role |
 |---|---|

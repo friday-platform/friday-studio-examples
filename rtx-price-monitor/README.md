@@ -56,8 +56,6 @@ Once both steps are done, the schedule fires automatically at the top of every h
 
 If no listings qualify, no email is sent.
 
-![RTX 5080 sub-$1400 price alert email](../assets/rtx-price-monitor/rtx-5080-price-alert-email.png)
-
 ---
 
 ## How to use it
@@ -65,10 +63,6 @@ If no listings qualify, no email is sent.
 It runs automatically. Nothing to trigger, nothing to open.
 
 If you want to run a check immediately outside the hourly schedule, trigger the `rtx-price-check-cron` signal from the workspace.
-
-![Triggering an on-demand price check from chat](../assets/rtx-price-monitor/chat-price-check-email-prompt.png)
-
-![Hourly scheduled runs in the Activity tab](../assets/rtx-price-monitor/activity-tab-hourly-runs.png)
 
 ---
 

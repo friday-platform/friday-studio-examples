@@ -62,8 +62,6 @@ No email recipient to configure, no additional MCP servers to enable. The digest
 > **Summary**
 > 1 open PR, 1 review pending. No urgent items.
 
-![PR digest output in chat](../assets/github-digest/chat-pr-digest-output.png)
-
 ---
 
 ## How to use it

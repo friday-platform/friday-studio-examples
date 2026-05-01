@@ -31,8 +31,6 @@ Point it at a sheet and ask anything:
 2. Under **Credentials**, click **Add one**
 3. Follow the OAuth flow to grant access to your Google account
 
-![Google Sheets entry in the MCP Catalog](../assets/google-sheets-query/mcp-catalog-google-sheets.png)
-
 Once connected, the agent can immediately list and read any spreadsheet your Google account has access to.
 
 ---
@@ -42,8 +40,6 @@ Once connected, the agent can immediately list and read any spreadsheet your Goo
 > **You:** What were total sales by region last quarter?
 >
 > **Agent:** Based on the "Q3 Sales" sheet in your "2024 Revenue" spreadsheet (rows 2–847), here's the breakdown by region...
-
-![Asking the workspace which ad campaigns performed best](../assets/google-sheets-query/chat-ad-campaign-analysis.png)
 
 ---
 
