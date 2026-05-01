@@ -17,14 +17,12 @@ You can expect an initial acknowledgement within 3 business days. We will keep y
 
 ## Scope
 
-This repository contains example Friday workspaces (`workspace.yml` files, prompts, and supporting docs). In-scope reports include:
+This repository contains example Friday workspaces — `workspace.yml` files, prompts, and supporting docs. In-scope reports cover issues in the contents of this repo, such as:
 
-- Example workspaces that leak credentials, secrets, or user data
-- Prompts or jobs that could be coerced into destructive behavior against connected accounts (Gmail, GitHub, Google Drive, etc.) by untrusted input
-- MCP server configurations that grant excessive privileges by default
-- Supply-chain concerns with how examples reference external resources
+- Hardcoded credentials, secrets, or personal data committed to any example
+- Example `workspace.yml` files that reference untrusted or attacker-controllable resources
 
-Vulnerabilities in the Friday desktop app itself, or in upstream MCP servers, should be reported to their respective maintainers. For Friday app issues, see [hellofriday.ai](https://hellofriday.ai).
+Out of scope: the Friday desktop app, upstream MCP servers, and third-party services that examples connect to. Report those to their respective maintainers.
 
 ## Using Examples Safely
 
