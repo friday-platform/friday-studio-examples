@@ -10,7 +10,7 @@ Each example is a complete workspace: a `workspace.yml` describing signals, jobs
 |---|---|
 | [Competitive Monitor](competitive-monitor) | Weekly competitor intelligence brief — product, pricing, GTM, partnerships, leadership signals with sourced links |
 | [Daily Operating Memo](daily-operating-memo) | Pulls today's calendar and priority email each morning and emails you a one-page daily plan |
-| [DnD Campaign Manager](dnd_campaign_manager) | Persistent campaign state for tabletop RPG sessions — NPCs, locations, plot threads tracked across sessions |
+| [DnD Campaign Manager](dnd-campaign-manager) | Persistent campaign state for tabletop RPG sessions — NPCs, locations, plot threads tracked across sessions |
 | [GitHub Digest](github-digest) | Twice-weekly digest of your open PRs and review requests, no dashboard required |
 | [GitHub PR Reviewer](github-pr-reviewer) | On-demand AI review of any GitHub pull request, posted back as a PR comment |
 | [Google Sheets Query](google-sheets-query) | Natural-language Q&A over a Google Sheet via the Sheets MCP server |
