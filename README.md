@@ -27,7 +27,11 @@ Each example is a complete workspace you can read end-to-end: a single `workspac
 
 ## Getting started
 
-You'll need [Friday Studio](https://hellofriday.ai) installed (macOS 12 or later) and an [Anthropic API key](https://console.anthropic.com).
+You'll need:
+
+- A Mac (macOS 12 or later)
+- [Friday Studio](https://hellofriday.ai) installed
+- An [Anthropic API key](https://console.anthropic.com) — this is what powers the AI
 
 ### Run an example
 
