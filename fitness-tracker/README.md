@@ -10,6 +10,10 @@ No app to open, no form to fill. Just tell it what you did:
 
 ---
 
+![fitness-tracker output](../assets/fitness-tracker/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday
