@@ -34,5 +34,9 @@
   {
     "name": "Inbox Zero",
     "folder": "inbox-zero"
+  },
+  {
+    "name": "Fitness Tracker",
+    "folder": "fitness-tracker"
   }
 ]

@@ -1,0 +1,286 @@
+version: "1.0"
+
+workspace:
+  name: Fitness Tracker
+  description: Track lifting sessions (upper/lower body) and daily nutrition (calories, protein, fiber, carbs) with a 150g/day protein goal.
+
+signals:
+  log-workout:
+    description: Log a lifting session — upper or lower body
+    provider: http
+    config:
+      path: /log-workout
+    schema:
+      type: object
+      properties:
+        workout_type:
+          type: string
+          description: Upper Body or Lower Body
+        exercises:
+          type: string
+          description: "Exercises performed, e.g. 'Bench press 3x8 185lb, OHP 3x10 115lb'"
+        notes:
+          type: string
+          description: Optional notes (energy level, PRs, etc.)
+      required: [workout_type, exercises]
+
+  log-meal:
+    description: Log a meal with macros
+    provider: http
+    config:
+      path: /log-meal
+    schema:
+      type: object
+      properties:
+        meal_name:
+          type: string
+          description: "Name or description of the meal, e.g. 'Chicken and rice'"
+        calories:
+          type: string
+          description: Calories (kcal)
+        protein:
+          type: string
+          description: Protein in grams
+        fiber:
+          type: string
+          description: Fiber in grams
+        carbs:
+          type: string
+          description: Carbohydrates in grams
+      required: [meal_name, calories, protein, fiber, carbs]
+
+  daily-summary:
+    description: Pull today's nutrition totals and workout log — compare protein against 150g goal
+    provider: http
+    config:
+      path: /daily-summary
+
+  generate-workout-plan:
+    description: Generate a workout plan for today — alternates upper/lower body and avoids recently done exercises
+    provider: http
+    config:
+      path: /generate-workout-plan
+    schema:
+      type: object
+      properties:
+        preferences:
+          type: string
+          description: "Optional preferences or constraints, e.g. 'no barbell today', 'focus on hypertrophy', 'short session'"
+      required: []
+
+agents:
+  log-workout-agent:
+    description: Logs a lifting session (upper or lower body) to memory with exercises, sets, reps, and notes.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      temperature: 0.3
+      tools:
+        - memory_save
+        - memory_read
+      prompt: |
+        You are a fitness logging assistant. The user has just completed a lifting session. Record the workout entry to memory in a concise, structured format.
+
+        Workout details from the signal:
+        - Type: {{inputs.workout_type}} (upper or lower body)
+        - Exercises: {{inputs.exercises}}
+        - Notes: {{inputs.notes}}
+
+        Save a memory entry to the 'notes' store with the format:
+        [WORKOUT - {{inputs.workout_type}}] <date>: <exercises summary>. Notes: <notes if any>
+
+        Also respond with a brief confirmation summary of what was logged.
+
+  log-meal-agent:
+    description: Logs a meal with calories, protein, fiber, and carbs to memory.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      temperature: 0.3
+      tools:
+        - memory_save
+        - memory_read
+      prompt: |
+        You are a nutrition logging assistant. The user has just eaten a meal. Record it to memory.
+
+        Meal details from the signal:
+        - Meal name/description: {{inputs.meal_name}}
+        - Calories: {{inputs.calories}}
+        - Protein: {{inputs.protein}}g
+        - Fiber: {{inputs.fiber}}g
+        - Carbs: {{inputs.carbs}}g
+
+        Save a memory entry to the 'notes' store with the format:
+        [MEAL] <date> <time>: {{inputs.meal_name}} — {{inputs.calories}} kcal | P: {{inputs.protein}}g | F: {{inputs.fiber}}g | C: {{inputs.carbs}}g
+
+        Respond with a brief confirmation of what was logged.
+
+  daily-summary-agent:
+    description: Reads today's meal and workout logs from memory and produces a daily summary with nutrition totals vs goals.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      temperature: 0.3
+      tools:
+        - memory_save
+        - memory_read
+      prompt: |
+        You are a fitness and nutrition summary assistant. Read the recent memory entries and produce a daily summary for today.
+
+        Daily protein goal: 150g
+
+        Steps:
+        1. Read the 'notes' memory store to find today's [MEAL] and [WORKOUT] entries.
+        2. Sum up today's totals: calories, protein, carbs, fiber.
+        3. Compare protein to the 150g goal and note how much is remaining (or if goal was hit).
+        4. List any workout sessions today.
+        5. Output a clean, readable daily summary.
+
+        Format:
+        ## Daily Summary — <date>
+
+        ### Nutrition
+        - Calories: X kcal
+        - Protein: Xg / 150g goal (Xg remaining / goal met!)
+        - Carbs: Xg
+        - Fiber: Xg
+
+        ### Meals Logged
+        - <list each meal>
+
+        ### Workouts
+        - <list each workout or 'Rest day'>
+
+        ### Notes
+        <Any observations, e.g. protein gap, good macro day, etc.>
+
+  workout-planner-agent:
+    description: Generates a workout plan alternating upper/lower body, deprioritizing exercises done in the last 2-3 sessions.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      temperature: 0.3
+      tools:
+        - memory_read
+      prompt: |
+        You are an expert strength training coach. Generate a workout plan for today.
+
+        Steps:
+        1. Read the 'notes' memory store to find recent [WORKOUT] entries (last 2-3 sessions).
+        2. Determine what the LAST workout type was (Upper Body or Lower Body) — the next plan should be the OPPOSITE. If no history exists, start with Upper Body.
+        3. Identify which exercises were performed in the last 2-3 sessions of the SAME type.
+        4. Build a plan of 5-6 exercises that:
+           - Prioritizes exercises NOT done recently
+           - Avoids repeating any exercise done in the last 2 sessions of the same type
+           - Covers all major muscle groups for the workout type
+           - Includes sets, reps, and a suggested weight range or RPE
+        5. If the user specified any preferences in {{inputs.preferences}}, incorporate them.
+
+        Upper Body muscle groups to cover: chest, back (horizontal + vertical pull), shoulders, triceps, biceps
+        Lower Body muscle groups to cover: quads, hamstrings, glutes, calves, core
+
+        Output format:
+        ## Workout Plan — <Upper/Lower> Body — <date>
+
+        **Based on recent history:** <brief note on what you saw and what you're deprioritizing>
+
+        | Exercise | Sets | Reps | Weight/RPE |
+        |---|---|---|---|
+        | ... | ... | ... | ... |
+
+        **Notes:** <any coaching tips, focus cues, or progressions to try today>
+
+jobs:
+  log-workout:
+    description: Log a lifting session to memory
+    triggers:
+      - signal: log-workout
+    fsm:
+      initial: idle
+      states:
+        idle:
+          on:
+            log-workout:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: log-workout-agent
+              outputTo: workout-log-result
+          type: final
+
+  log-meal:
+    description: Log a meal with macros to memory
+    triggers:
+      - signal: log-meal
+    fsm:
+      initial: idle
+      states:
+        idle:
+          on:
+            log-meal:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: log-meal-agent
+              outputTo: meal-log-result
+          type: final
+
+  daily-summary:
+    description: Generate daily nutrition and workout summary vs protein goal
+    triggers:
+      - signal: daily-summary
+    fsm:
+      initial: idle
+      states:
+        idle:
+          on:
+            daily-summary:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: daily-summary-agent
+              outputTo: daily-summary-result
+          type: final
+
+  generate-workout-plan:
+    description: Generate a personalized workout plan based on recent session history
+    triggers:
+      - signal: generate-workout-plan
+    fsm:
+      initial: idle
+      states:
+        idle:
+          on:
+            generate-workout-plan:
+              target: run
+        run:
+          entry:
+            - type: agent
+              agentId: workout-planner-agent
+              outputTo: workout-plan-result
+          type: final
+
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
