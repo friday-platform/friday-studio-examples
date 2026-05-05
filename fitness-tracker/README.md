@@ -3,6 +3,7 @@
 A lifting and nutrition tracking workspace. Log workouts and meals through chat, track daily protein against a 150g goal, and get personalized workout plans that build on your recent session history.
 
 No app to open, no form to fill. Just tell it what you did:
+
 - "Just did upper body — bench 3x8 185, OHP 3x10 115"
 - "Had chicken and rice, about 500 cal, 45g protein"
 - "What's my summary for today?"
@@ -17,16 +18,19 @@ No app to open, no form to fill. Just tell it what you did:
 ## Setup
 
 ### 1. Download Friday
+
 1. Go to [hellofriday.ai](https://hellofriday.ai) and download the macOS installer
 2. Open the DMG and drag Friday to your Applications folder
 3. Launch Friday and complete the initial setup
 
 ### 2. Import the workspace
+
 1. Open Friday and go to **Discover Spaces**
 2. Find this workspace and click it
 3. Click **Add Space**
 
 ### 3. Connect the Telegram communicator
+
 1. Go to your space > **Overview > Info > Communicators**
 2. Find the Telegram communicator and connect it
 
