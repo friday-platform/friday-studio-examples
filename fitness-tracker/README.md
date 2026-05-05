@@ -54,6 +54,8 @@ Talk to the workspace in chat. Four things you can do:
 
 ## How it works
 
+![fitness-tracker workspace overview in Friday](../assets/fitness-tracker/how-it-works.png)
+
 | Component | Role |
 |---|---|
 | `log-workout-agent` | Parses workout descriptions and writes session records to memory |
