@@ -15,10 +15,6 @@ tools:
         transport:
           type: http
           url: 'http://localhost:8001/mcp'
-        client_config:
-          timeout:
-            progressTimeout: 60s
-            maxTotalTimeout: 30m
         auth:
           type: bearer
           token_env: GOOGLE_CALENDAR_ACCESS_TOKEN
@@ -27,6 +23,10 @@ tools:
             from: link
             provider: google-calendar
             key: access_token
+        client_config:
+          timeout:
+            progressTimeout: 60s
+            maxTotalTimeout: 30m
         startup:
           type: command
           command: uvx
@@ -43,10 +43,6 @@ tools:
         transport:
           type: http
           url: 'http://localhost:8002/mcp'
-        client_config:
-          timeout:
-            progressTimeout: 60s
-            maxTotalTimeout: 30m
         auth:
           type: bearer
           token_env: GOOGLE_GMAIL_ACCESS_TOKEN
@@ -55,6 +51,10 @@ tools:
             from: link
             provider: google-gmail
             key: access_token
+        client_config:
+          timeout:
+            progressTimeout: 60s
+            maxTotalTimeout: 30m
         startup:
           type: command
           command: uvx
@@ -90,6 +90,7 @@ jobs:
               inputFrom:
                 - calendar-result
                 - email-result
+              outputTo: memo-result
               type: agent
             - event: DONE
               type: emit
@@ -129,7 +130,7 @@ agents:
     config:
       provider: anthropic
       model: claude-haiku-4-5
-      prompt: "You are fetching today's Google Calendar events for a daily operating memo.\n\nThe current date, time, and timezone are injected into your context via the signal payload or system context. Use them to construct today's full-day window in ISO 8601 format — from midnight (00:00:00) to end of day (23:59:59) in the user's LOCAL timezone (America/Los_Angeles, UTC-07:00). Do NOT use UTC midnight as the start — that would miss events earlier in the day.\n\nFor example, if today is 2026-04-28 in America/Los_Angeles (UTC-07:00), the range is:\n  timeMin: 2026-04-28T00:00:00-07:00\n  timeMax: 2026-04-28T23:59:59-07:00\n\nDo the following:\n1. Call `google-calendar/list_calendars` to get the user's calendars.\n2. Call `google-calendar/get_events` for the primary calendar using today's FULL day range in the local timezone as described above.\n3. Return a structured text block titled **\U0001F4C5 TODAY'S CALENDAR** listing ALL events for the full day with: time (in local time), title, duration, attendees (if any), and location/meeting link. Sort chronologically.\n4. Flag any event starting within the next 2 hours with a ⚡ prefix.\n5. If no events, say 'No events scheduled today.'"
+      prompt: "You are fetching today's Google Calendar events for a daily operating memo.\n\nThe current date, time, and timezone are injected into your context via the signal payload or system context. Use them to construct today's full-day window in ISO 8601 format — from midnight (00:00:00) to end of day (23:59:59) in the user's LOCAL timezone (America/Los_Angeles, UTC-07:00). Do NOT use UTC midnight as the start — that would miss events earlier in the day.\n\nFor example, if today is 2026-04-28 in America/Los_Angeles (UTC-07:00), the range is:\n  timeMin: 2026-04-28T00:00:00-07:00\n  timeMax: 2026-04-28T23:59:59-07:00\n\nDo the following:\n1. Call `google-calendar/list_calendars` to get the user's calendars.\n2. Call `google-calendar/get_events` for the primary calendar using today's FULL day range in the local timezone as described above.\n3. Return a structured text block titled **\U0001F4C5 TODAY'S CALENDAR** listing ALL events for the full day with: time (in local time), title, duration, attendees (if any), and location/meeting link. Sort chronologically.\n4. Flag any event starting within the next 2 hours with a ⚡ prefix.\n5. If no events, say 'No events scheduled today.'\n\n6. REQUIRED: Call complete() with a brief summary of what was done. The job will time out if complete() is not called."
       temperature: 0.3
       tools:
         - google-calendar/list_calendars
@@ -140,7 +141,7 @@ agents:
     config:
       provider: anthropic
       model: claude-haiku-4-5
-      prompt: "You are scanning Gmail for the daily operating memo.\n\nDo the following:\n1. Call `google-gmail/search_gmail_messages` with query `is:unread newer_than:1d` to find recent unread emails.\n2. Call `google-gmail/search_gmail_messages` again with query `is:important newer_than:2d` to find important/starred items.\n3. Fetch content for up to the 10 most relevant messages using `google-gmail/get_gmail_messages_content_batch`.\n4. Return a structured block titled **\U0001F4EC EMAIL PRIORITIES** with:\n   - Items needing a reply today (mark with \U0001F534)\n   - Items to be aware of but no action needed (mark with \U0001F7E1)\n   - Any deadlines or time-sensitive threads (mark with ⏰)\n5. Keep each item to one line: sender, subject, and a 5-word summary of what's needed.\n6. If inbox is clear, say 'No urgent emails.'"
+      prompt: "You are scanning Gmail for the daily operating memo.\n\nDo the following:\n1. Call `google-gmail/search_gmail_messages` with query `is:unread newer_than:1d` to find recent unread emails.\n2. Call `google-gmail/search_gmail_messages` again with query `is:important newer_than:2d` to find important/starred items.\n3. Fetch content for up to the 10 most relevant messages using `google-gmail/get_gmail_messages_content_batch`.\n4. Return a structured block titled **\U0001F4EC EMAIL PRIORITIES** with:\n   - Items needing a reply today (mark with \U0001F534)\n   - Items to be aware of but no action needed (mark with \U0001F7E1)\n   - Any deadlines or time-sensitive threads (mark with ⏰)\n5. Keep each item to one line: sender, subject, and a 5-word summary of what's needed.\n6. If inbox is clear, say 'No urgent emails.'\n\n7. REQUIRED: Call complete() with a brief summary of what was done. The job will time out if complete() is not called."
       temperature: 0.3
       tools:
         - google-gmail/search_gmail_messages
@@ -206,6 +207,9 @@ agents:
 
         4. After sending, return a one-line confirmation: 'Daily memo sent to  [ADD EMAIL RECIPIENT
         HERE]'.
+
+
+        5. REQUIRED: Call complete() with a brief summary of what was done. The job will time out if complete() is not called.
       temperature: 0.3
       tools:
         - google-gmail/send_gmail_message

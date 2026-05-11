@@ -174,7 +174,7 @@ agents:
         ## Step 1: Read the existing world
 
 
-        Call `memory_read` with memoryName: "notes" to load the campaign roster. Look for entries
+        Call `list_memory_entries` with memoryName: "notes" to load the campaign roster. Look for entries
         with metadata kind: "npc" to get existing NPCs, and kind: "session-log" for recent events.
 
 
@@ -213,7 +213,7 @@ agents:
         ## Step 3: Save to memory
 
 
-        Call `memory_save` with:
+        Call `save_memory_entry` with:
 
         - memoryName: "notes"
 
@@ -229,10 +229,13 @@ agents:
 
         Return the full formatted NPC sheet. Lead with cross-references — that's the most valuable
         part for the DM.
+
+
+        REQUIRED: When finished, call complete() with a one-line summary of what was created or retrieved. The job will time out if complete() is not called.
       temperature: 0.3
       tools:
-        - memory_read
-        - memory_save
+        - list_memory_entries
+        - save_memory_entry
   quest-generator:
     description: >-
       Reads the full NPC roster from memory and generates a side quest that involves existing
@@ -251,7 +254,7 @@ agents:
         ## Step 1: Read the world
 
 
-        Call `memory_read` with memoryName: "notes" to load the campaign data. Look for:
+        Call `list_memory_entries` with memoryName: "notes" to load the campaign data. Look for:
 
         - Entries with metadata kind: "npc" — these are your available characters
 
@@ -299,7 +302,7 @@ agents:
         ## Step 3: Save to memory
 
 
-        Call `memory_save` with:
+        Call `save_memory_entry` with:
 
         - memoryName: "notes"
 
@@ -315,10 +318,13 @@ agents:
 
         Return the full quest formatted for the DM. Make the NPC selection rationale prominent —
         that's what makes it feel coherent.
+
+
+        REQUIRED: When finished, call complete() with a one-line summary of what was created or retrieved. The job will time out if complete() is not called.
       temperature: 0.3
       tools:
-        - memory_read
-        - memory_save
+        - list_memory_entries
+        - save_memory_entry
   roster-viewer:
     description: Reads and displays the full NPC and quest roster from memory in a readable format for the DM.
     type: llm
@@ -329,7 +335,7 @@ agents:
         You are a D&D campaign world assistant. Display the campaign roster clearly for the DM.
 
 
-        Call `memory_read` with memoryName: "notes" to load all campaign data.
+        Call `list_memory_entries` with memoryName: "notes" to load all campaign data.
 
 
         From the results, separate entries by their metadata `kind` field:
@@ -362,9 +368,12 @@ agents:
 
 
         Keep it scannable. This is a quick reference, not an essay.
+
+
+        REQUIRED: When finished, call complete() with a one-line summary of what was created or retrieved. The job will time out if complete() is not called.
       temperature: 0.3
       tools:
-        - memory_read
+        - list_memory_entries
   session-logger:
     description: Logs session notes to memory and updates NPC records based on what happened in the session.
     type: llm
@@ -383,7 +392,7 @@ agents:
         ## Step 1: Read current roster
 
 
-        Call `memory_read` with memoryName: "notes" to load all existing campaign data. Look for
+        Call `list_memory_entries` with memoryName: "notes" to load all existing campaign data. Look for
         entries with kind: "npc" to see existing characters.
 
 
@@ -406,7 +415,7 @@ agents:
         ## Step 3: Save new/updated NPCs
 
 
-        For each new NPC invented during the session, call `memory_save` with:
+        For each new NPC invented during the session, call `save_memory_entry` with:
 
         - memoryName: "notes"
 
@@ -424,7 +433,7 @@ agents:
         ## Step 4: Save the session summary
 
 
-        Call `memory_save` with:
+        Call `save_memory_entry` with:
 
         - memoryName: "notes"
 
@@ -444,10 +453,13 @@ agents:
         - Any continuity flags (things that might contradict earlier lore)
 
         - Loose threads to follow up on next session
+
+
+        REQUIRED: When finished, call complete() with a one-line summary of what was created or retrieved. The job will time out if complete() is not called.
       temperature: 0.3
       tools:
-        - memory_read
-        - memory_save
+        - list_memory_entries
+        - save_memory_entry
 memory:
   own:
     - name: notes

@@ -2,25 +2,6 @@ version: '1.0'
 workspace:
   name: GitHub Digest
   description: Scheduled GitHub PR and review digest every Monday and Thursday
-tools:
-  mcp:
-    client_config:
-      timeout:
-        progressTimeout: 2m
-        maxTotalTimeout: 30m
-    servers:
-      github:
-        transport:
-          type: http
-          url: 'https://api.githubcopilot.com/mcp'
-        auth:
-          type: bearer
-          token_env: GH_TOKEN
-        env:
-          GH_TOKEN:
-            from: link
-            provider: github
-            key: access_token
 signals:
   github-digest-schedule:
     description: 'Fires every Monday and Thursday at 8:30am Pacific'
@@ -54,36 +35,52 @@ jobs:
           type: final
 agents:
   github-digest-agent:
+    type: llm
     description: >-
       Fetches open PRs and review requests for the authenticated GitHub user, then produces a
-      concise digest
-    type: llm
+      concise digest grouped by repository.
     config:
       provider: anthropic
-      model: claude-opus-4-6
+      model: claude-sonnet-4-6
       prompt: >-
-        You are a GitHub digest assistant. Your task:
+        You are a GitHub digest assistant.
 
+        1. Call `get_me` to find the authenticated user's login.
 
-        1. Call `github/get_me` to find the authenticated user's login.
+        2. Call `list_pull_requests` filtering for open PRs authored by the user across
+           their repos.
 
-        2. Call `github/search_pull_requests` with query `is:pr is:open author:<login>` to get open
-        PRs authored by the user.
+        3. Call `list_pull_requests` filtering for PRs where review is requested from the user.
 
-        3. Call `github/search_pull_requests` with query `is:pr is:open review-requested:<login>` to
-        get PRs awaiting the user's review.
+        4. Group results by repository. For each PR include: title, number, URL, author,
+           and age in days (calculated from created_at).
 
-        4. Produce a clean, scannable Markdown digest with these sections:
-           - **Your Open PRs** — title, repo, URL, age, and review status (approved/changes requested/awaiting)
-           - **Review Requested** — PRs where you're asked to review, with title, repo, URL, and author
-           - **Summary** — one sentence on total counts and any urgent items
+        5. Produce a concise digest sorted by oldest first within each group.
 
-        Keep it concise. Use bullet points. Link every PR by title. Note if a section is empty.
-      temperature: 0.3
+        REQUIRED: Call complete() with a summary of how many PRs were found across how many
+        repos. The job will time out if complete() is not called.
       tools:
         - github/get_me
-        - github/search_pull_requests
-        - github/pull_request_read
+        - github/list_pull_requests
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers:
+      github:
+        transport:
+          type: http
+          url: 'https://api.githubcopilot.com/mcp'
+        auth:
+          type: bearer
+          token_env: GH_TOKEN
+        env:
+          GH_TOKEN:
+            from: link
+            provider: github
+            key: access_token
 memory:
   own:
     - name: notes
