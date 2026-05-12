@@ -1,7 +1,8 @@
 version: '1.0'
 workspace:
   name: RTX Price Monitor
-  description: Monitors RTX 5080 prices hourly and emails you if any listing drops below $1400
+  description: Monitors RTX 5080 prices hourly and emails you if any listing drops
+    below $1400
 tools:
   mcp:
     client_config:
@@ -12,7 +13,7 @@ tools:
       google-gmail:
         transport:
           type: http
-          url: 'http://localhost:8002/mcp'
+          url: http://localhost:8002/mcp
         client_config:
           timeout:
             progressTimeout: 60s
@@ -29,14 +30,14 @@ tools:
           type: command
           command: uvx
           args:
-            - workspace-mcp
-            - '--tools'
-            - gmail
-            - '--transport'
-            - streamable-http
+          - workspace-mcp
+          - --tools
+          - gmail
+          - --transport
+          - streamable-http
           env:
             WORKSPACE_MCP_PORT: '8002'
-          ready_url: 'http://localhost:8002/mcp'
+          ready_url: http://localhost:8002/mcp
 signals:
   rtx-price-check-cron:
     description: Triggers RTX 5080 price check every hour
@@ -48,7 +49,7 @@ jobs:
   rtx-price-monitor:
     description: Scrapes RTX 5080 prices hourly and emails you if any are under $1400
     triggers:
-      - signal: rtx-price-check-cron
+    - signal: rtx-price-check-cron
     fsm:
       initial: idle
       states:
@@ -58,21 +59,22 @@ jobs:
               target: scrape
         scrape:
           entry:
-            - type: agent
-              agentId: rtx-price-scraper
-              outputTo: price-data
-            - type: emit
-              event: DONE
+          - type: agent
+            agentId: rtx-price-scraper
+            outputTo: price-data
+          - type: emit
+            event: DONE
           'on':
             DONE:
               target: alert
         alert:
           entry:
-            - type: agent
-              agentId: rtx-alert-emailer
-              inputFrom: price-data
-            - type: emit
-              event: DONE
+          - type: agent
+            agentId: rtx-alert-emailer
+            inputFrom:
+            - price-data
+          - type: emit
+            event: DONE
           'on':
             DONE:
               target: done
@@ -82,59 +84,62 @@ agents:
   rtx-price-scraper:
     type: atlas
     agent: web
-    description: Scrapes RTX 5080 prices from major retailers and returns structured price data
-    prompt: >-
-      Search for current RTX 5080 GPU prices. Check these sources: Best Buy, Newegg, Amazon, and B&H
-      Photo. For each listing found, extract: retailer name, product name/model, current price
-      (USD), availability (in stock / out of stock / backorder), and direct URL. Look for any
-      listings under $1400. Return results as a JSON array like: [{"retailer": "...", "product":
-      "...", "price": 999, "available": true, "url": "..."}]. If a price is unavailable or the
-      product is out of stock, still include it with the best info you have. Focus on the RTX 5080
-      (not 5080 Super, not 5090).
+    description: Scrapes RTX 5080 prices from major retailers and returns structured
+      price data
+    prompt: 'Search for current RTX 5080 GPU prices. Check these sources: Best Buy,
+      Newegg, Amazon, and B&H Photo. For each listing found, extract: retailer name,
+      product name/model, current price (USD), availability (in stock / out of stock
+      / backorder), and direct URL. Look for any listings under $1400. Return results
+      as a JSON array like: [{"retailer": "...", "product": "...", "price": 999, "available":
+      true, "url": "..."}]. If a price is unavailable or the product is out of stock,
+      still include it with the best info you have. Focus on the RTX 5080 (not 5080
+      Super, not 5090).'
   rtx-alert-emailer:
-    description: Sends a Gmail alert to you if any RTX 5080 listing is found under $1400
+    description: Sends a Gmail alert if any RTX 5080 listing is found under $1400
     type: llm
     config:
       provider: anthropic
       model: claude-sonnet-4-6
-      prompt: >-
-        You have received RTX 5080 price data from a scraper. Review the data and send an email ONLY
-        if any listing shows a price under $1400 AND is in stock or available.
+      prompt: 'You have received RTX 5080 price data from a scraper. Review the data
+        and send an email ONLY if any listing shows a price under $1400 AND is in
+        stock or available.
 
 
-        If qualifying listings are found, call the google-gmail/send_gmail_message tool to send an
-        email with:
+        If qualifying listings are found, call the google-gmail/send_gmail_message
+        tool to send an email with:
 
-        - to: "[ADD EMAIL RECIPIENT HERE]"
+        - to: "YOUR_EMAIL_ADDRESS"
 
         - subject: RTX 5080 Alert: Sub-$1400 listing found!
 
-        - body: A summary of all qualifying listings including retailer, product name, price,
-        availability, and direct purchase URL. Mention this was found by an automated price monitor.
+        - body: A summary of all qualifying listings including retailer, product name,
+        price, availability, and direct purchase URL. Mention this was found by an
+        automated price monitor.
 
 
-        If NO listings are under $1400, do NOT send an email — just output the message "No sub-$1400
-        listings found, no email sent."
+        If NO listings are under $1400, do NOT send an email — just output the message
+        "No sub-$1400 listings found, no email sent."
 
 
-        REQUIRED: Call complete() with a one-line summary of the outcome (listings found or not, email sent or not). The job will time out if complete() is not called.
+        REQUIRED: Call complete() with a one-line summary of the outcome. The job
+        will time out if complete() is not called.'
       temperature: 0.3
       tools:
-        - google-gmail/send_gmail_message
+      - google-gmail/send_gmail_message
 memory:
   own:
-    - name: notes
-      type: short_term
-      strategy: narrative
-    - name: memory
-      type: long_term
-      strategy: narrative
+  - name: notes
+    type: short_term
+    strategy: narrative
+  - name: memory
+    type: long_term
+    strategy: narrative
   mounts:
-    - name: user-notes
-      source: user/narrative/notes
-      mode: ro
-      scope: workspace
-    - name: user-memory
-      source: user/narrative/memory
-      mode: ro
-      scope: workspace
+  - name: user-notes
+    source: user/narrative/notes
+    mode: ro
+    scope: workspace
+  - name: user-memory
+    source: user/narrative/memory
+    mode: ro
+    scope: workspace

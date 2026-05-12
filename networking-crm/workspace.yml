@@ -1,31 +1,28 @@
 version: '1.0'
 workspace:
   name: Networking CRM
-  description: >-
-    Relationship tracking system — log interactions, surface follow-ups, and keep your network warm
-    over time.
+  description: Relationship tracking system — log interactions, surface follow-ups,
+    and keep your network warm over time
 signals:
   crm-chat:
-    description: 'Log an interaction, add context, or ask about a contact'
+    description: Log an interaction, add context, or ask about a contact
     schema:
       type: object
       properties:
         message:
           type: string
-          description: 'Your message — log an interaction, add contact context, or ask about someone'
+          description: Your message — log an interaction, add contact context, or
+            ask about someone
       required:
-        - message
+      - message
     provider: http
     config:
       path: /crm/chat
-communicators:
-  telegram:
-    kind: telegram
 jobs:
   crm-interact:
     title: CRM Interaction
     triggers:
-      - signal: crm-chat
+    - signal: crm-chat
     fsm:
       initial: idle
       states:
@@ -35,18 +32,18 @@ jobs:
               target: respond
         respond:
           entry:
-            - type: agent
-              agentId: crm-assistant
-              outputTo: crm-output
-              outputType: crm-response
-              prompt: >-
-                The user has sent a message. It is either logging an interaction with a contact,
-                adding context about a contact, or asking about a contact. If logging or adding
-                context, save it to memory in a structured format: contact name, date, summary, and
-                any follow-up action. If asking about a contact, read from memory and respond with
-                what you know. Always confirm what you did or answer clearly.
-            - type: emit
-              event: ADVANCE
+          - type: agent
+            agentId: crm-assistant
+            outputTo: crm-output
+            outputType: crm-response
+            prompt: 'The user has sent a message. It is either logging an interaction
+              with a contact, adding context about a contact, or asking about a contact.
+              If logging or adding context, save it to memory in a structured format:
+              contact name, date, summary, and any follow-up action. If asking about
+              a contact, read from memory and respond with what you know. Always confirm
+              what you did or answer clearly.'
+          - type: emit
+            event: ADVANCE
           'on':
             ADVANCE:
               target: done
@@ -61,52 +58,55 @@ agents:
     config:
       provider: anthropic
       model: claude-sonnet-4-6
-      prompt: >-
-        You are a networking CRM assistant. Your job is to help the user maintain and grow their
-        professional relationships. You track interactions, surface who needs a follow-up, and help
-        keep the network warm over time.
+      prompt: 'You are a networking CRM assistant. Your job is to help the user maintain
+        and grow their professional relationships. You track interactions, surface
+        who needs a follow-up, and help keep the network warm over time.
 
 
-        When the user logs an interaction or adds context about someone, save it to memory with:
-        contact name, company/role if known, date, what happened, any commitments made, and the next
-        follow-up action or timeline.
+        When the user logs an interaction or adds context about someone, save it to
+        memory with: contact name, company/role if known, date, what happened, any
+        commitments made, and the next follow-up action or timeline.
 
 
-        When the user asks about a contact, read from memory and summarize what you know — last
-        interaction, relationship strength, pending follow-ups, and any relevant context.
+        When the user asks about a contact, read from memory and summarize what you
+        know — last interaction, relationship strength, pending follow-ups, and any
+        relevant context.
 
 
-        When the user asks who they should follow up with, scan memory and surface contacts whose
-        last interaction was a while ago or who have an outstanding next step.
+        When the user asks who they should follow up with, scan memory and surface
+        contacts whose last interaction was a while ago or who have an outstanding
+        next step.
 
 
-        Always be proactive about suggesting follow-up timing based on relationship context (e.g. a
-        warm lead needs a shorter follow-up cycle than a casual connection). Keep responses short
-        and conversational. Never fabricate relationship details. If you do not know something, say
-        so.
+        Always be proactive about suggesting follow-up timing based on relationship
+        context. Keep responses short and conversational. Never fabricate relationship
+        details. If you do not know something, say so.
 
 
-        REQUIRED: When finished with each response, call complete() with a brief summary of what was done. The job will time out if complete() is not called.
+        REQUIRED: When finished with each response, call complete() with a brief summary
+        of what was done. The job will time out if complete() is not called.'
       temperature: 0.3
       max_tokens: 1000
-      tool_choice: auto
       tools:
-        - save_memory_entry
-        - list_memory_entries
+      - save_memory_entry
+      - list_memory_entries
 memory:
   own:
-    - name: notes
-      type: short_term
-      strategy: narrative
-    - name: memory
-      type: long_term
-      strategy: narrative
+  - name: notes
+    type: short_term
+    strategy: narrative
+  - name: memory
+    type: long_term
+    strategy: narrative
   mounts:
-    - name: user-notes
-      source: user/narrative/notes
-      mode: ro
-      scope: workspace
-    - name: user-memory
-      source: user/narrative/memory
-      mode: ro
-      scope: workspace
+  - name: user-notes
+    source: user/narrative/notes
+    mode: ro
+    scope: workspace
+  - name: user-memory
+    source: user/narrative/memory
+    mode: ro
+    scope: workspace
+communicators:
+  telegram:
+    kind: telegram

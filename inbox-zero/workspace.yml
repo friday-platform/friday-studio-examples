@@ -1,9 +1,8 @@
 version: '1.0'
 workspace:
   name: Inbox Zero
-  description: >-
-    Interactive inbox triage with letter-key actions (Archive, Keep, Mark Unread, Delete,
-    Unsubscribe) and proactive auto-processing with preference memory.
+  description: Interactive inbox triage with letter-key actions and proactive auto-processing
+    with preference memory
 tools:
   mcp:
     client_config:
@@ -14,7 +13,7 @@ tools:
       google-gmail:
         transport:
           type: http
-          url: 'http://localhost:8002/mcp'
+          url: http://localhost:8002/mcp
         client_config:
           timeout:
             progressTimeout: 60s
@@ -31,35 +30,34 @@ tools:
           type: command
           command: uvx
           args:
-            - workspace-mcp
-            - '--tools'
-            - gmail
-            - '--transport'
-            - streamable-http
+          - workspace-mcp
+          - --tools
+          - gmail
+          - --transport
+          - streamable-http
           env:
             WORKSPACE_MCP_PORT: '8002'
-          ready_url: 'http://localhost:8002/mcp'
+          ready_url: http://localhost:8002/mcp
 signals:
   triage-inbox:
-    description: Trigger interactive inbox triage — pull 10 unread emails and review with letter-key actions
+    description: Trigger interactive inbox triage — pull 10 unread emails and review
+      with letter-key actions
     provider: http
     config:
       path: /inbox-zero/triage
   autopilot-inbox:
-    description: >-
-      Proactive inbox processing — runs daily at 8am PT, auto-acts on high-confidence emails and
-      writes a report
+    description: Proactive inbox processing — runs daily at 8am PT, auto-acts on high-confidence
+      emails and writes a report
     provider: schedule
     config:
       schedule: 0 8 * * *
       timezone: America/Los_Angeles
 jobs:
   triage-inbox-job:
-    description: >-
-      Interactive inbox triage — presents 10 unread emails with (A)rchive (K)eep (U)nread (D)elete
-      (S)ubscribe actions
+    description: Interactive inbox triage — presents 10 unread emails with (A)rchive
+      (K)eep (U)nread (D)elete (S)ubscribe actions
     triggers:
-      - signal: triage-inbox
+    - signal: triage-inbox
     fsm:
       initial: idle
       states:
@@ -69,26 +67,25 @@ jobs:
               target: review
         review:
           entry:
-            - type: agent
-              agentId: inbox-reviewer
-              outputTo: triage-result
-              prompt: >-
-                Load preferences, fetch the 10 most recent unread emails, and walk through each one
-                interactively presenting (A)rchive (K)eep (U)nread (D)elete (S)ubscribe options.
-                Save preference patterns to memory after completing all 10.
-            - type: emit
-              event: DONE
+          - type: agent
+            agentId: inbox-reviewer
+            outputTo: triage-result
+            prompt: Load preferences, fetch the 10 most recent unread emails, and
+              walk through each one interactively presenting (A)rchive (K)eep (U)nread
+              (D)elete (S)ubscribe options. Save preference patterns to memory after
+              completing all 10.
+          - type: emit
+            event: DONE
           'on':
             DONE:
               target: done
         done:
           type: final
   autopilot-inbox-job:
-    description: >-
-      Proactive daily inbox processing — auto-acts on high-confidence emails using learned
-      preferences, writes markdown report to ~/inbox-zero-reports/
+    description: Proactive daily inbox processing — auto-acts on high-confidence emails
+      using learned preferences, writes markdown report
     triggers:
-      - signal: autopilot-inbox
+    - signal: autopilot-inbox
     fsm:
       initial: idle
       states:
@@ -98,16 +95,15 @@ jobs:
               target: process
         process:
           entry:
-            - type: agent
-              agentId: inbox-autopilot
-              outputTo: autopilot-result
-              prompt: >-
-                Load preferences from memory, fetch up to 25 unread emails, classify each with a
-                confidence score, auto-act on confidence >= 0.85, leave the rest untouched, write a
-                markdown report to ~/inbox-zero-reports/report-{timestamp}.md, and update preference
-                memory.
-            - type: emit
-              event: DONE
+          - type: agent
+            agentId: inbox-autopilot
+            outputTo: autopilot-result
+            prompt: Load preferences from memory, fetch up to 25 unread emails, classify
+              each with a confidence score, auto-act on confidence >= 0.85, leave
+              the rest untouched, write a markdown report to ~/inbox-zero-reports/report-{timestamp}.md,
+              and update preference memory.
+          - type: emit
+            event: DONE
           'on':
             DONE:
               target: done
@@ -115,151 +111,93 @@ jobs:
           type: final
 agents:
   inbox-reviewer:
-    description: >-
-      Fetches the latest 10 unread emails and presents them one-by-one for interactive triage with
-      letter-key actions.
+    description: Fetches the latest 10 unread emails and presents them one-by-one
+      for interactive triage with letter-key actions.
     type: llm
     config:
       provider: anthropic
       model: claude-sonnet-4-6
-      prompt: >-
-        You are an inbox triage assistant helping [INSERT EMAIL RECIPIENT HERE].
-
-
-        Your job:
-
-        1. Search for the 10 most recent unread emails using search_gmail_messages with query
-        'is:unread in:inbox' and maxResults=10.
-
-        2. Fetch their full content in a batch using get_gmail_messages_content_batch.
-
-        3. For each email, display a clear summary card:
-
-           ─────────────────────────────────────────
-           [#N of 10] Subject: ...
-           From: ...
-           Date: ...
-           Preview: (first ~150 chars of body)
-           ─────────────────────────────────────────
-           (A) Archive  (K) Keep  (U) Mark Unread  (D) Delete  (S) Unsubscribe
-
-        4. Wait for the user's letter input, then apply the action:
-           - A → remove INBOX label (archive) via modify_gmail_message_labels
-           - K → do nothing, move to next
-           - U → add UNREAD label via modify_gmail_message_labels (re-mark unread)
-           - D → add TRASH label via modify_gmail_message_labels
-           - S → look for an unsubscribe link in the email body, present it to the user, and mark the email as archived
-
-        5. After each action, note the sender/domain and action taken. At the end of all 10, call
-        save_memory_entry with store='preferences' and a brief narrative update. Use the name found in the
-        'notes' memory store (look for an entry like 'User's name is ...') — if found, use that name
-        (e.g. 'Joe archives newsletters from X, deletes promotions from Y, keeps emails from Z
-        domains'); if not found, fall back to 'The user'. Merge with any existing preference
-        patterns.
-
-
-        6. Display a summary of all actions taken at the end.
-
-
-        7. REQUIRED: Call complete() with a one-line summary of how many emails were triaged and what actions were taken. The job will time out if complete() is not called.
-
-
-        Always check the 'preferences' memory store at the start to load any prior triage
-        preferences and use them to suggest likely actions (show the suggestion in brackets next to
-        each option, e.g. '(A) Archive [suggested]').
+      prompt: "You are an inbox triage assistant helping YOUR_EMAIL_ADDRESS.\n\nYour\
+        \ job:\n\n1. Search for the 10 most recent unread emails using search_gmail_messages\
+        \ with query 'is:unread in:inbox' and maxResults=10.\n\n2. Fetch their full\
+        \ content in a batch using get_gmail_messages_content_batch.\n\n3. For each\
+        \ email, display a clear summary card:\n\n   ─────────────────────────────────────────\n\
+        \   [#N of 10] Subject: ...\n   From: ...\n   Date: ...\n   Preview: (first\
+        \ ~150 chars of body)\n   ─────────────────────────────────────────\n   (A)\
+        \ Archive  (K) Keep  (U) Mark Unread  (D) Delete  (S) Unsubscribe\n\n4. Wait\
+        \ for the user's letter input, then apply the action:\n   - A → remove INBOX\
+        \ label (archive) via modify_gmail_message_labels\n   - K → do nothing, move\
+        \ to next\n   - U → add UNREAD label via modify_gmail_message_labels (re-mark\
+        \ unread)\n   - D → add TRASH label via modify_gmail_message_labels\n   -\
+        \ S → look for an unsubscribe link in the email body, present it to the user,\
+        \ and mark the email as archived\n\n5. After each action, note the sender/domain\
+        \ and action taken. At the end of all 10, call save_memory_entry with store='preferences'\
+        \ and a brief narrative update.\n\n6. Display a summary of all actions taken\
+        \ at the end.\n\n7. REQUIRED: Call complete() with a one-line summary of how\
+        \ many emails were triaged and what actions were taken. The job will time\
+        \ out if complete() is not called.\n\nAlways check the 'preferences' memory\
+        \ store at the start to load any prior triage preferences."
       temperature: 0.3
       max_steps: 60
       tools:
-        - google-gmail/search_gmail_messages
-        - google-gmail/get_gmail_messages_content_batch
-        - google-gmail/get_gmail_message_content
-        - google-gmail/modify_gmail_message_labels
-        - save_memory_entry
-        - list_memory_entries
+      - google-gmail/search_gmail_messages
+      - google-gmail/get_gmail_messages_content_batch
+      - google-gmail/get_gmail_message_content
+      - google-gmail/modify_gmail_message_labels
+      - save_memory_entry
+      - list_memory_entries
   inbox-autopilot:
-    description: >-
-      Proactively triages unread inbox with learned preferences, takes high-confidence actions
-      automatically, writes a disk report.
+    description: Proactively triages unread inbox with learned preferences, takes
+      high-confidence actions automatically, writes a disk report.
     type: llm
     config:
       provider: anthropic
       model: claude-sonnet-4-6
-      prompt: >-
-        You are an autonomous inbox processor helping [INSERT EMAIL RECIPIENT HERE].
-
-
-        Run this pipeline:
-
-
-        1. LOAD PREFERENCES: Read from the 'preferences' memory store. Extract all sender patterns,
-        domains, and action rules you have established through prior triage sessions.
-
-
-        2. FETCH EMAILS: Use search_gmail_messages with query 'is:unread in:inbox' maxResults=25.
-        Then fetch full content via get_gmail_messages_content_batch.
-
-
-        3. CLASSIFY each email with a confidence score (0.0-1.0) and proposed action:
-           - Archive: newsletters, automated notifications, receipts/confirmations from known vendors, marketing from domains you have previously archived
-           - Delete: spam, promotional mass-mail from domains you have previously deleted
-           - Keep: emails requiring response, emails from humans, emails matching domains you have previously kept
-           - Unsubscribe: mailing lists from domains you have previously unsubscribed from
-           - Review (no auto-action): anything ambiguous or confidence < 0.85
-
-        4. AUTO-ACT on emails with confidence >= 0.85:
-           - Archive: remove INBOX label via modify_gmail_message_labels
-           - Delete: add TRASH label via modify_gmail_message_labels
-           - Keep: no label change
-           - Unsubscribe: archive it (remove INBOX label) — note the unsubscribe URL in the report
-           Do NOT auto-act on confidence < 0.85 items.
-
-        5. WRITE REPORT: Write a markdown report to disk at:
-        ~/inbox-zero-reports/report-{YYYY-MM-DD-HH-MM}.md
-
-           The report must include:
-           - Run timestamp
-           - Total unread emails processed
-           - Summary table: Subject | From | Action Taken | Confidence
-           - Separate section: 'Needs Review' — emails that were skipped (low confidence), with full subject and sender so you can handle them manually
-           - Unsubscribe links discovered (if any)
-           - Any errors or anomalies
-
-           Use the filesystem to write this file. First ensure the directory exists.
-
-        6. UPDATE PREFERENCES: After processing, call save_memory_entry with store='preferences' to
-        reinforce any new clear patterns observed.
-
-
-        7. REQUIRED: Call complete() with a brief summary of what was done. The job will time out if complete() is not called.
-
-
-        Return a brief summary of actions taken and the report file path.
+      prompt: "You are an autonomous inbox processor helping YOUR_EMAIL_ADDRESS.\n\
+        \nRun this pipeline:\n\n1. LOAD PREFERENCES: Read from the 'preferences' memory\
+        \ store. Extract all sender patterns, domains, and action rules you have established\
+        \ through prior triage sessions.\n\n2. FETCH EMAILS: Use search_gmail_messages\
+        \ with query 'is:unread in:inbox' maxResults=25. Then fetch full content via\
+        \ get_gmail_messages_content_batch.\n\n3. CLASSIFY each email with a confidence\
+        \ score (0.0-1.0) and proposed action:\n   - Archive: newsletters, automated\
+        \ notifications, receipts/confirmations from known vendors\n   - Delete: spam,\
+        \ promotional mass-mail\n   - Keep: emails requiring response, emails from\
+        \ humans\n   - Unsubscribe: mailing lists from domains you have previously\
+        \ unsubscribed from\n   - Review (no auto-action): anything ambiguous or confidence\
+        \ < 0.85\n\n4. AUTO-ACT on emails with confidence >= 0.85:\n   - Archive:\
+        \ remove INBOX label via modify_gmail_message_labels\n   - Delete: add TRASH\
+        \ label via modify_gmail_message_labels\n   - Keep: no label change\n   -\
+        \ Unsubscribe: archive it — note the unsubscribe URL in the report\n   Do\
+        \ NOT auto-act on confidence < 0.85 items.\n\n5. WRITE REPORT to ~/inbox-zero-reports/report-{YYYY-MM-DD-HH-MM}.md\n\
+        \n6. UPDATE PREFERENCES: call save_memory_entry with store='preferences' to\
+        \ reinforce new patterns.\n\n7. REQUIRED: Call complete() with a brief summary\
+        \ of what was done. The job will time out if complete() is not called."
       temperature: 0.3
       max_steps: 80
       tools:
-        - google-gmail/search_gmail_messages
-        - google-gmail/get_gmail_messages_content_batch
-        - google-gmail/get_gmail_message_content
-        - google-gmail/modify_gmail_message_labels
-        - save_memory_entry
-        - list_memory_entries
+      - google-gmail/search_gmail_messages
+      - google-gmail/get_gmail_messages_content_batch
+      - google-gmail/get_gmail_message_content
+      - google-gmail/modify_gmail_message_labels
+      - save_memory_entry
+      - list_memory_entries
 memory:
   own:
-    - name: notes
-      type: short_term
-      strategy: narrative
-    - name: memory
-      type: long_term
-      strategy: narrative
-    - name: preferences
-      type: long_term
-      strategy: narrative
+  - name: notes
+    type: short_term
+    strategy: narrative
+  - name: memory
+    type: long_term
+    strategy: narrative
+  - name: preferences
+    type: long_term
+    strategy: narrative
   mounts:
-    - name: user-notes
-      source: user/narrative/notes
-      mode: ro
-      scope: workspace
-    - name: user-memory
-      source: user/narrative/memory
-      mode: ro
-      scope: workspace
+  - name: user-notes
+    source: user/narrative/notes
+    mode: ro
+    scope: workspace
+  - name: user-memory
+    source: user/narrative/memory
+    mode: ro
+    scope: workspace

@@ -12,7 +12,7 @@ tools:
       google-sheets:
         transport:
           type: http
-          url: 'http://localhost:8005/mcp'
+          url: http://localhost:8005/mcp
         client_config:
           timeout:
             progressTimeout: 60s
@@ -29,14 +29,14 @@ tools:
           type: command
           command: uvx
           args:
-            - workspace-mcp
-            - '--tools'
-            - sheets
-            - '--transport'
-            - streamable-http
+          - workspace-mcp
+          - --tools
+          - sheets
+          - --transport
+          - streamable-http
           env:
             WORKSPACE_MCP_PORT: '8005'
-          ready_url: 'http://localhost:8005/mcp'
+          ready_url: http://localhost:8005/mcp
 signals:
   query-sheet:
     description: Query a Google Sheet with a natural language question
@@ -48,17 +48,18 @@ signals:
           description: What do you want to know from the spreadsheet?
         spreadsheet:
           type: string
-          description: Spreadsheet name or URL (optional — agent will list available sheets if omitted)
+          description: Spreadsheet name or URL (optional)
       required:
-        - question
+      - question
     provider: http
     config:
       path: /query-sheet
 jobs:
   query-sheet-job:
-    description: Accepts a natural language question and queries the relevant Google Sheet to answer it
+    description: Accepts a natural language question and queries the relevant Google
+      Sheet to answer it
     triggers:
-      - signal: query-sheet
+    - signal: query-sheet
     fsm:
       initial: idle
       states:
@@ -68,14 +69,13 @@ jobs:
               target: run
         run:
           entry:
-            - type: agent
-              agentId: sheets-query-agent
-              outputTo: query-result
-              prompt: >-
-                The user has a question about their Google Sheets data. Answer it fully, including
-                the source spreadsheet and sheet name.
-            - type: emit
-              event: DONE
+          - type: agent
+            agentId: sheets-query-agent
+            outputTo: query-result
+            prompt: The user has a question about their Google Sheets data. Answer
+              it fully, including the source spreadsheet and sheet name.
+          - type: emit
+            event: DONE
           'on':
             DONE:
               target: done
@@ -83,16 +83,14 @@ jobs:
           type: final
 agents:
   sheets-query-agent:
-    description: >-
-      Queries Google Sheets using natural language. Can list spreadsheets, read data, and answer
-      questions about sheet contents.
+    description: Queries Google Sheets using natural language. Can list spreadsheets,
+      read data, and answer questions about sheet contents.
     type: llm
     config:
       provider: anthropic
       model: claude-sonnet-4-6
-      prompt: >-
-        You are a Google Sheets assistant. You help users query, explore, and understand their
-        spreadsheet data.
+      prompt: 'You are a Google Sheets assistant. You help users query, explore, and
+        understand their spreadsheet data.
 
 
         Your capabilities:
@@ -108,47 +106,50 @@ agents:
 
         Workflow:
 
-        1. If the user hasn't specified a spreadsheet, call list_spreadsheets to show what's
-        available.
+        1. If the user hasn''t specified a spreadsheet, call list_spreadsheets to
+        show what''s available.
 
-        2. If a spreadsheet is specified but no sheet/range, call get_spreadsheet_info first to
-        understand the structure.
+        2. If a spreadsheet is specified but no sheet/range, call get_spreadsheet_info
+        first to understand the structure.
 
-        3. Read the relevant data with read_sheet_values, then answer the user's question directly.
+        3. Read the relevant data with read_sheet_values, then answer the user''s
+        question directly.
 
-        4. When presenting tabular data, format it clearly as a list or structured summary.
+        4. When presenting tabular data, format it clearly as a list or structured
+        summary.
 
         5. Save key findings to memory so follow-up queries can reference prior context.
 
 
-        6. REQUIRED: Call complete() with a brief summary of what data was found and what question was answered. The job will time out if complete() is not called.
+        6. REQUIRED: Call complete() with a brief summary of what data was found and
+        what question was answered. The job will time out if complete() is not called.
 
 
-        Always be specific about what data you found and where it came from (spreadsheet name, sheet
-        name, range).
+        Always be specific about what data you found and where it came from (spreadsheet
+        name, sheet name, range).'
       temperature: 0.3
       max_steps: 15
       tools:
-        - google-sheets/list_spreadsheets
-        - google-sheets/get_spreadsheet_info
-        - google-sheets/read_sheet_values
-        - google-sheets/list_sheet_tables
-        - save_memory_entry
-        - list_memory_entries
+      - google-sheets/list_spreadsheets
+      - google-sheets/get_spreadsheet_info
+      - google-sheets/read_sheet_values
+      - google-sheets/list_sheet_tables
+      - save_memory_entry
+      - list_memory_entries
 memory:
   own:
-    - name: notes
-      type: short_term
-      strategy: narrative
-    - name: memory
-      type: long_term
-      strategy: narrative
+  - name: notes
+    type: short_term
+    strategy: narrative
+  - name: memory
+    type: long_term
+    strategy: narrative
   mounts:
-    - name: user-notes
-      source: user/narrative/notes
-      mode: ro
-      scope: workspace
-    - name: user-memory
-      source: user/narrative/memory
-      mode: ro
-      scope: workspace
+  - name: user-notes
+    source: user/narrative/notes
+    mode: ro
+    scope: workspace
+  - name: user-memory
+    source: user/narrative/memory
+    mode: ro
+    scope: workspace
