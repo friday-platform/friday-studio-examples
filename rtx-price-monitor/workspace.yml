@@ -115,6 +115,9 @@ agents:
 
         If NO listings are under $1400, do NOT send an email — just output the message "No sub-$1400
         listings found, no email sent."
+
+
+        REQUIRED: Call complete() with a one-line summary of the outcome (listings found or not, email sent or not). The job will time out if complete() is not called.
       temperature: 0.3
       tools:
         - google-gmail/send_gmail_message

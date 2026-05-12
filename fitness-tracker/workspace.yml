@@ -77,8 +77,8 @@ agents:
       model: claude-opus-4-5
       temperature: 0.3
       tools:
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
       prompt: |
         You are a fitness logging assistant. The user has just completed a lifting session. Record the workout entry to memory in a concise, structured format.
 
@@ -92,6 +92,8 @@ agents:
 
         Also respond with a brief confirmation summary of what was logged.
 
+        REQUIRED: When finished, call complete() with a brief confirmation of what was logged or generated. The job will time out if complete() is not called.
+
   log-meal-agent:
     description: Logs a meal with calories, protein, fiber, and carbs to memory.
     type: llm
@@ -100,8 +102,8 @@ agents:
       model: claude-opus-4-5
       temperature: 0.3
       tools:
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
       prompt: |
         You are a nutrition logging assistant. The user has just eaten a meal. Record it to memory.
 
@@ -117,6 +119,8 @@ agents:
 
         Respond with a brief confirmation of what was logged.
 
+        REQUIRED: When finished, call complete() with a brief confirmation of what was logged or generated. The job will time out if complete() is not called.
+
   daily-summary-agent:
     description: Reads today's meal and workout logs from memory and produces a daily summary with nutrition totals vs goals.
     type: llm
@@ -125,8 +129,8 @@ agents:
       model: claude-opus-4-5
       temperature: 0.3
       tools:
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
       prompt: |
         You are a fitness and nutrition summary assistant. Read the recent memory entries and produce a daily summary for today.
 
@@ -157,6 +161,8 @@ agents:
         ### Notes
         <Any observations, e.g. protein gap, good macro day, etc.>
 
+        REQUIRED: When finished, call complete() with a brief confirmation of what was logged or generated. The job will time out if complete() is not called.
+
   workout-planner-agent:
     description: Generates a workout plan alternating upper/lower body, deprioritizing exercises done in the last 2-3 sessions.
     type: llm
@@ -165,7 +171,7 @@ agents:
       model: claude-opus-4-5
       temperature: 0.3
       tools:
-        - memory_read
+        - list_memory_entries
       prompt: |
         You are an expert strength training coach. Generate a workout plan for today.
 
@@ -194,6 +200,8 @@ agents:
 
         **Notes:** <any coaching tips, focus cues, or progressions to try today>
 
+        REQUIRED: When finished, call complete() with a brief confirmation of what was logged or generated. The job will time out if complete() is not called.
+
 jobs:
   log-workout:
     description: Log a lifting session to memory
@@ -211,6 +219,12 @@ jobs:
             - type: agent
               agentId: log-workout-agent
               outputTo: workout-log-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
           type: final
 
   log-meal:
@@ -229,6 +243,12 @@ jobs:
             - type: agent
               agentId: log-meal-agent
               outputTo: meal-log-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
           type: final
 
   daily-summary:
@@ -247,6 +267,12 @@ jobs:
             - type: agent
               agentId: daily-summary-agent
               outputTo: daily-summary-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
           type: final
 
   generate-workout-plan:
@@ -265,6 +291,12 @@ jobs:
             - type: agent
               agentId: workout-planner-agent
               outputTo: workout-plan-result
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
           type: final
 
 memory:

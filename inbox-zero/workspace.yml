@@ -123,7 +123,7 @@ agents:
       provider: anthropic
       model: claude-sonnet-4-6
       prompt: >-
-        You are an inbox triage assistant for [INSERT EMAIL RECIPIENT HERE].
+        You are an inbox triage assistant helping [INSERT EMAIL RECIPIENT HERE].
 
 
         Your job:
@@ -151,7 +151,7 @@ agents:
            - S → look for an unsubscribe link in the email body, present it to the user, and mark the email as archived
 
         5. After each action, note the sender/domain and action taken. At the end of all 10, call
-        memory_save with store='preferences' and a brief narrative update. Use the name found in the
+        save_memory_entry with store='preferences' and a brief narrative update. Use the name found in the
         'notes' memory store (look for an entry like 'User's name is ...') — if found, use that name
         (e.g. 'Joe archives newsletters from X, deletes promotions from Y, keeps emails from Z
         domains'); if not found, fall back to 'The user'. Merge with any existing preference
@@ -159,6 +159,9 @@ agents:
 
 
         6. Display a summary of all actions taken at the end.
+
+
+        7. REQUIRED: Call complete() with a one-line summary of how many emails were triaged and what actions were taken. The job will time out if complete() is not called.
 
 
         Always check the 'preferences' memory store at the start to load any prior triage
@@ -171,8 +174,8 @@ agents:
         - google-gmail/get_gmail_messages_content_batch
         - google-gmail/get_gmail_message_content
         - google-gmail/modify_gmail_message_labels
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
   inbox-autopilot:
     description: >-
       Proactively triages unread inbox with learned preferences, takes high-confidence actions
@@ -182,7 +185,7 @@ agents:
       provider: anthropic
       model: claude-sonnet-4-6
       prompt: >-
-        You are an autonomous inbox processor for [INSERT EMAIL RECIPIENT HERE].
+        You are an autonomous inbox processor helping [INSERT EMAIL RECIPIENT HERE].
 
 
         Run this pipeline:
@@ -223,8 +226,11 @@ agents:
 
            Use the filesystem to write this file. First ensure the directory exists.
 
-        6. UPDATE PREFERENCES: After processing, call memory_save with store='preferences' to
+        6. UPDATE PREFERENCES: After processing, call save_memory_entry with store='preferences' to
         reinforce any new clear patterns observed.
+
+
+        7. REQUIRED: Call complete() with a brief summary of what was done. The job will time out if complete() is not called.
 
 
         Return a brief summary of actions taken and the report file path.
@@ -235,8 +241,8 @@ agents:
         - google-gmail/get_gmail_messages_content_batch
         - google-gmail/get_gmail_message_content
         - google-gmail/modify_gmail_message_labels
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
 memory:
   own:
     - name: notes

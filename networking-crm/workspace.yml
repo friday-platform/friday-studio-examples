@@ -84,12 +84,15 @@ agents:
         warm lead needs a shorter follow-up cycle than a casual connection). Keep responses short
         and conversational. Never fabricate relationship details. If you do not know something, say
         so.
+
+
+        REQUIRED: When finished with each response, call complete() with a brief summary of what was done. The job will time out if complete() is not called.
       temperature: 0.3
       max_tokens: 1000
       tool_choice: auto
       tools:
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
 memory:
   own:
     - name: notes

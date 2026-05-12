@@ -121,6 +121,9 @@ agents:
         5. Save key findings to memory so follow-up queries can reference prior context.
 
 
+        6. REQUIRED: Call complete() with a brief summary of what data was found and what question was answered. The job will time out if complete() is not called.
+
+
         Always be specific about what data you found and where it came from (spreadsheet name, sheet
         name, range).
       temperature: 0.3
@@ -130,8 +133,8 @@ agents:
         - google-sheets/get_spreadsheet_info
         - google-sheets/read_sheet_values
         - google-sheets/list_sheet_tables
-        - memory_save
-        - memory_read
+        - save_memory_entry
+        - list_memory_entries
 memory:
   own:
     - name: notes
