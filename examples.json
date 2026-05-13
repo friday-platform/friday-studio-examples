@@ -38,5 +38,9 @@
   {
     "name": "Fitness Tracker",
     "folder": "fitness-tracker"
+  },
+  {
+    "name": "2D Asset Pipeline",
+    "folder": "2d-asset-pipeline"
   }
 ]

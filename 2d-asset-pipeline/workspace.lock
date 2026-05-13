@@ -1,0 +1,14 @@
+schemaVersion: 1
+mode: definition
+workspace:
+  name: 2D Asset Pipeline
+  version: '1.0'
+primitives:
+  skills: {}
+  agents:
+    file-saver:
+      hash: 'sha256:9206803fba31625acb7e8fdaa4b2bd2d534ef9a8c49617c1c9567a13f51f2a07'
+      path: agents/file-saver
+    spritesheet-normalizer:
+      hash: 'sha256:18ae715048326ab6d384b28bf358efaf439812ae69bfbce434e1325bd89c7608'
+      path: agents/spritesheet-normalizer
