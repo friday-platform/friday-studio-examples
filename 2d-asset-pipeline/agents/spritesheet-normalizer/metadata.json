@@ -1,0 +1,7 @@
+{
+  "id": "spritesheet-normalizer",
+  "version": "1.1.0",
+  "description": "Normalizes a raw AI-generated spritesheet PNG/JPEG into a clean RGBA PNG with exact frame dimensions, transparent background (detected from image corners), and NEAREST-resampled pixel art frames. When canvas dimensions do not match expected (frame_count x frame_w), attempts neon-green column boundary detection to find actual frame edges. If boundary detection also fails, returns regenerate=True so the FSM can re-trigger generation.",
+  "entrypoint": "agent.py",
+  "hash": "0953ab97f2c2dece1612ecbfee5c7aa7934c38b45f725906c084372054fcefff"
+}

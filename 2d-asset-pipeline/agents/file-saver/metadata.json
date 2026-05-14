@@ -1,0 +1,7 @@
+{
+  "id": "file-saver",
+  "version": "2.0.0",
+  "description": "Fetches a generated image artifact from the Friday API and saves it to disk as PNG. Uses a timestamp-based filename. Returns destination_path.",
+  "entrypoint": "agent.py",
+  "hash": "99a08caae0c2547eed69bef2e3115c85527b029912dd8c2302152d1838324123"
+}

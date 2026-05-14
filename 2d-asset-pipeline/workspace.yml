@@ -1,0 +1,444 @@
+version: '1.0'
+workspace:
+  name: 2D Asset Pipeline
+  description: >-
+    Pixel art asset creation pipeline: generate single assets, create animation frames, and pack
+    sprite atlases with JSON coordinates.
+tools:
+  mcp:
+    client_config:
+      timeout:
+        progressTimeout: 2m
+        maxTotalTimeout: 30m
+    servers:
+      filesystem:
+        transport:
+          type: stdio
+          command: npx
+          args:
+            - '-y'
+            - '@modelcontextprotocol/server-filesystem'
+            - '${HOME}'
+signals:
+  create-pixel-asset:
+    description: Generate a single 2D pixel art asset from a text description
+    schema:
+      type: object
+      properties:
+        description:
+          type: string
+          description: 'What to generate, e.g. ''a medieval sword'' or ''a red mushroom'''
+        size:
+          type: string
+          description: 'Pixel dimensions, e.g. 64x64 or 32x32 (default: 64x64)'
+        style:
+          type: string
+          description: 'Art style notes, e.g. ''SNES palette'', ''dark fantasy'', ''cute chibi'''
+      required:
+        - description
+    provider: http
+    config:
+      path: /create-pixel-asset
+  create-animation-frames:
+    description: Generate animation frames for a pixel art sprite as a looping GIF
+    schema:
+      type: object
+      properties:
+        description:
+          type: string
+          description: 'The sprite to animate, e.g. ''a walking knight'' or ''a flickering torch'''
+        animation:
+          type: string
+          description: 'What animation to create, e.g. ''walk cycle'', ''idle breathing'', ''steam rising'''
+        frame_count:
+          type: string
+          description: 'Number of animation frames (default: 4)'
+        size:
+          type: string
+          description: 'Pixel dimensions per frame, e.g. 64x64 (default: 64x64)'
+        frame_delay_ms:
+          type: string
+          description: 'Milliseconds per frame in the GIF (default: 150)'
+      required:
+        - description
+        - animation
+    provider: http
+    config:
+      path: /create-animation-frames
+jobs:
+  create-pixel-asset-job:
+    description: Generate a single pixel art game asset from a description
+    triggers:
+      - signal: create-pixel-asset
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            create-pixel-asset:
+              target: generate
+        generate:
+          entry:
+            - type: agent
+              agentId: pixel-asset-generator
+              outputTo: generated-asset
+              prompt: >-
+                Generate a single pixel art game asset. Description: {{inputs.description}}. Canvas
+                size: exactly {{inputs.size | default: '64x64'}} pixels. Style: {{inputs.style |
+                default: 'classic SNES/GBA style'}}.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: save-file
+        save-file:
+          entry:
+            - type: agent
+              agentId: file-saver
+              inputFrom: generated-asset
+              outputTo: saved-file
+              prompt: >-
+                Save the generated image artifact to disk. Output directory: {{inputs.output_dir |
+                default: '~/game_assets'}}. prefix: asset_
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: remove-background
+        remove-background:
+          entry:
+            - type: agent
+              agentId: background-remover
+              inputFrom: saved-file
+              outputTo: bg-removed-file
+              prompt: Remove the neon green background from the image. The file path is in the input.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: resize
+        resize:
+          entry:
+            - type: agent
+              agentId: image-resizer
+              inputFrom: bg-removed-file
+              outputTo: resized-file
+              prompt: >-
+                Resize the saved image to exactly {{inputs.size | default: '64x64'}} pixels. The
+                file path is in the input.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+  create-animation-frames-job:
+    description: >-
+      Generate pixel art animation frames as a spritesheet, then assemble into an animated GIF with
+      transparent background
+    triggers:
+      - signal: create-animation-frames
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            create-animation-frames:
+              target: generate-frames
+        generate-frames:
+          entry:
+            - type: agent
+              agentId: animation-frame-generator
+              outputTo: spritesheet-result
+              prompt: >-
+                Generate an animation spritesheet. Sprite: {{inputs.description}}. Animation:
+                {{inputs.animation}}. Frames: {{inputs.frame_count | default: '4'}}. Size per frame:
+                {{inputs.size | default: '64x64'}}. No labels, no padding between frames. Solid neon
+                green (#00FF00) background. Do not use neon green on the sprite itself.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: save-spritesheet
+        save-spritesheet:
+          entry:
+            - type: agent
+              agentId: file-saver
+              inputFrom: spritesheet-result
+              outputTo: saved-spritesheet
+              prompt: >-
+                Save the generated image artifact to disk. Output directory: {{inputs.output_dir |
+                default: '~/game_assets'}}. prefix: spritesheet_
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: normalize-spritesheet
+        normalize-spritesheet:
+          entry:
+            - type: agent
+              agentId: spritesheet-normalizer
+              inputFrom: saved-spritesheet
+              outputTo: normalized-spritesheet
+              prompt: >-
+                {"frame_count": {{inputs.frame_count | default: '4'}}, "frame_w": {{inputs.size |
+                default: '64x64' | split: 'x' | first}}, "frame_h": {{inputs.size | default: '64x64'
+                | split: 'x' | last}}}
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: check-normalize-result
+        check-normalize-result:
+          entry:
+            - type: llm
+              provider: anthropic
+              model: claude-haiku-4-5
+              inputFrom: normalized-spritesheet
+              outputTo: normalize-check
+              validate: skip
+              prompt: >-
+                You receive the output of the spritesheet-normalizer. Look for a field called
+                'regenerate'.
+
+
+                Rules:
+
+                - If the output contains 'regenerate: true' or '"regenerate": true' → call
+                complete({ response: 'REGENERATE' })
+
+                - In ALL other cases (including dimension_mismatch, boundary-detected, or no
+                regenerate field at all) → call complete({ response: 'OK' })
+
+
+                Only boundary detection failure sets regenerate=true. A dimension_mismatch that was
+                successfully recovered via boundary detection will NOT have regenerate=true.
+
+
+                Call complete exactly once with either 'REGENERATE' or 'OK'.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: route-after-normalize
+        route-after-normalize:
+          entry:
+            - type: llm
+              provider: anthropic
+              model: claude-haiku-4-5
+              inputFrom: normalize-check
+              validate: skip
+              prompt: >-
+                Read the normalize-check result. If the response field is exactly 'REGENERATE', emit
+                event REGENERATE. If the response is 'OK', emit event OK.
+              tools: []
+            - type: emit
+              event: OK
+          'on':
+            OK:
+              target: assemble-gif
+            REGENERATE:
+              target: generate-frames
+        assemble-gif:
+          entry:
+            - type: agent
+              agentId: gif-assembler
+              inputFrom: normalized-spritesheet
+              outputTo: assembled-gif
+              prompt: >-
+                Slice the spritesheet into {{inputs.frame_count | default: '4'}} frames and assemble
+                a looping GIF. Frame size: {{inputs.size | default: '64x64'}}. Frame delay:
+                {{inputs.frame_delay_ms | default: '150'}}ms. Save the final GIF to
+                {{inputs.output_dir | default: '~/game_assets'}}. The spritesheet is
+                already a clean RGBA PNG with exact frame dimensions — slice purely by equal-width
+                columns, NEAREST resampling, no cropping.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: resize
+        resize:
+          entry:
+            - type: agent
+              agentId: image-resizer
+              inputFrom: assembled-gif
+              outputTo: resized-gif
+              prompt: >-
+                Resize the GIF to exactly {{inputs.size | default: '64x64'}} pixels per frame. The
+                file path is in the input. Use: magick "<path>" -coalesce -filter point -resize
+                <WxH>! -layers optimize "<path>" — nearest-neighbour to preserve crisp pixel art
+                edges. Verify final frame dimensions match the target size.
+            - type: emit
+              event: DONE
+          'on':
+            DONE:
+              target: done
+        done:
+          type: final
+agents:
+  pixel-asset-generator:
+    type: atlas
+    agent: image-generation
+    description: Generates a single pixel art PNG game asset from a description.
+    prompt: >-
+      Generate a single 2D pixel art sprite — one instance of the subject, nothing else. Generate ot
+      as a PNG image. The entire image canvas must be exactly the requested pixel dimensions (e.g.
+      32x32, 64x64). Do not tile, repeat, or show multiple versions of the sprite. Do not add
+      labels, borders, or padding. Pixel art style: hard edges, no anti-aliasing, limited color
+      palette, SNES/GBA era aesthetic. The background must be solid neon green (#00FF00) — every
+      pixel not occupied by the sprite must be exactly this color. Do not use neon green anywhere on
+      the sprite itself.
+  animation-frame-generator:
+    type: atlas
+    agent: image-generation
+    description: Generates a spritesheet of animation frames for a pixel art sprite
+    prompt: >-
+      Generate a pixel art animation spritesheet as a single PNG image. Create exactly the requested
+      number of frames (default 4) laid out side by side horizontally, each frame exactly the
+      requested size (default 64x64 pixels). The total canvas width must be frame_width ×
+      frame_count; height must equal frame_height — no extra rows, no padding between frames, no
+      labels or text of any kind. The sprite body must stay visually consistent across frames — same
+      proportions, same palette, same pixel positions — only animate the requested motion. Clean
+      pixel art style: hard pixel edges, zero anti-aliasing, limited color palette (≤16 colors
+      recommended), SNES/GBA era aesthetic. Every pixel must be either part of the sprite or solid
+      neon green (#00FF00) — no gradients, no blending at sprite edges, no semi-transparent pixels,
+      no shadows. The background must be solid neon green (#00FF00) everywhere outside the sprite.
+      Do not use neon green on the sprite itself.
+  gif-assembler:
+    description: Slices a spritesheet into frames and assembles them into an animated GIF
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-opus-4-5
+      prompt: >-
+        You are a GIF assembly agent. You receive a spritesheet image path and animation parameters.
+        Your job is to:
+
+        1. Use the bash tool to run a Python script that:
+           - Opens the spritesheet with Pillow (install via venv if needed)
+           - Slices it into equal-width frames (left to right)
+           - Optionally crops label rows from the bottom (trim bottom 18% if frames appear too tall)
+           - Resizes each frame to the target size (default 64x64) using NEAREST resampling
+           - Saves a looping GIF to the output path with the specified frame delay
+        2. Return the path to the generated GIF
+
+
+        Input will contain: image_path, frame_count, size (WxH), frame_delay_ms, output_path.
+
+        Use /tmp or the same directory as the source image for intermediate files if needed.
+
+        Always use a venv at /tmp/gif-venv for Pillow.
+      temperature: 0.3
+      tools:
+        - bash
+  file-saver:
+    description: >-
+      Fetches a generated image artifact from the Friday API and saves it to disk as PNG.
+      Deterministic — no LLM involved.
+    type: user
+    agent: file-saver
+  image-resizer:
+    description: >-
+      Resizes a saved image to exact pixel dimensions using ImageMagick, with a pre-blur to avoid
+      artifacts, then nearest-neighbour resampling to preserve pixel art fidelity.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-haiku-4-5
+      prompt: >-
+        You are an image resizing agent for pixel art assets. You receive a file path and a target
+        size (WxH, e.g. '32x32').
+
+
+        Run this exact command to resize in-place. Apply a gentle blur BEFORE scaling to prevent
+        aliasing artifacts when downscaling, then use nearest-neighbour for the actual scale so
+        pixel edges stay hard:
+
+          magick "<path>" -blur 0x0.5 -filter point -resize <WxH>! "<path>"
+
+        The `-blur 0x0.5` is a very mild Gaussian applied to the full-resolution image before
+        downscaling — it knocks out sub-pixel noise that causes moiré artifacts. `-filter point` is
+        nearest-neighbour so the final pixels are crisp. The `!` flag forces exact dimensions
+        ignoring aspect ratio.
+
+
+        Steps:
+
+        1. Extract the file path and size from the input.
+
+        2. Run the magick command above.
+
+        3. Verify the result with: magick identify "<path>" and confirm the dimensions match.
+
+        4. Return the file path and final dimensions.
+      temperature: 0.1
+      tools:
+        - bash
+  background-remover:
+    description: >-
+      Replaces neon green (#00FF00) background with transparency using two-pass ImageMagick:
+      fuzz-based chroma key for the solid background, then channel-math mask for residual neon green
+      pixels baked into the sprite.
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-haiku-4-5
+      prompt: >-
+        You are a background removal agent for pixel art assets. You receive a file path to a PNG
+        with a neon green (#00FF00) background.
+
+
+        Run these two ImageMagick commands in sequence:
+
+
+        **Pass 1 — chroma key the solid background:**
+          magick "<path>" -fuzz 5% -transparent "#00FF00" "<path>"
+
+        **Pass 2 — remove residual neon green pixels baked into the sprite:**
+
+        These are pixels where the green channel strongly dominates both red and blue (G > R+0.3 and
+        G > B+0.3 in 0-1 scale, and G > 0.3). Dark greens in the frame (e.g. #002E00) have G≈0.18
+        and will NOT be removed — they are safe.
+          magick "<path>" -fx "g > r+0.3 && g > b+0.3 && g > 0.3 ? 0 : 1" -compose CopyOpacity -composite "<path>.mask.png"
+          magick "<path>" "<path>.mask.png" -compose CopyOpacity -composite "<path>"
+          rm "<path>.mask.png"
+
+        Steps:
+
+        1. Extract the file path from the input.
+
+        2. Run Pass 1.
+
+        3. Run Pass 2 (three commands).
+
+        4. Verify: `magick identify -verbose "<path>" | grep -E 'Type|Alpha'` — confirm
+        TrueColorAlpha.
+
+        5. Return the file path and confirmation.
+      temperature: 0.1
+      tools:
+        - bash
+  spritesheet-normalizer:
+    description: >-
+      Normalizes a raw AI-generated spritesheet into a clean RGBA PNG: detects background color from
+      corners, removes it, slices into exact frame dimensions, NEAREST resamples.
+    type: user
+    agent: spritesheet-normalizer
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
