@@ -42,5 +42,9 @@
   {
     "name": "2D Asset Pipeline",
     "folder": "2d-asset-pipeline"
+  },
+  {
+    "name": "San Diego Surf Watch",
+    "folder": "san-diego-surf-watch"
   }
 ]

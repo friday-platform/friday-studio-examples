@@ -1,0 +1,101 @@
+version: '1.0'
+workspace:
+  name: San Diego Surf Watch
+  description: Monitors San Diego area surf conditions every 30 minutes and notifies when conditions are good.
+signals:
+  surf-check-cron:
+    description: Fires every 30 minutes to check San Diego surf conditions
+    provider: schedule
+    config:
+      schedule: '*/30 * * * *'
+      timezone: UTC
+jobs:
+  surf-watch:
+    description: Checks San Diego surf conditions every 30 min and notifies David if surf is good
+    triggers:
+      - signal: surf-check-cron
+    execution:
+      strategy: sequential
+      agents:
+        - surf-checker
+        - surf-evaluator
+agents:
+  surf-checker:
+    type: atlas
+    agent: web
+    description: Fetches current surf conditions for San Diego area beaches within 20 miles
+    prompt: >-
+      Search for current surf conditions at San Diego area beaches within a 20-mile radius. Check
+      Surfline, Magic Seaweed, or similar surf forecast sites. Look at beaches including: Ocean
+      Beach, Mission Beach, Pacific Beach, La Jolla Shores, Del Mar, Solana Beach, Encinitas
+      (Swamis), Carlsbad, and Oceanside. For each beach with notable conditions, extract: wave
+      height, wave period, wind speed and direction, swell direction, and current tide. Return a
+      structured summary of conditions at all checked beaches. Focus on accuracy — report exactly
+      what the forecast sites say.
+  surf-evaluator:
+    description: Evaluates surf conditions and saves a surf alert to memory if conditions are good
+    type: llm
+    config:
+      provider: anthropic
+      model: claude-sonnet-4-5
+      prompt: >-
+        You are a surf conditions analyst for David Woolf in San Diego.
+
+
+        You receive raw surf condition data for San Diego area beaches. Evaluate and decide whether
+        to notify David.
+
+
+        GOOD SURF criteria (at least one beach should meet these):
+
+        - Wave height: 3 feet or larger
+
+        - Wave period: 8 seconds or longer
+
+        - Wind: offshore or light (< 10 mph); onshore winds above 15 mph = poor
+
+        - Swell direction: NW, W, or SW (good for SD beaches)
+
+
+        POOR conditions (skip notification):
+
+        - Wave height under 2 feet
+
+        - Choppy onshore wind above 15 mph
+
+        - Short period (under 7 seconds) wind swell
+
+
+        Steps:
+
+        1. Analyze the surf report.
+
+        2. Identify best beach(es).
+
+        3. If conditions are good at any beach: call save_memory_entry with memoryName="memory" and
+        a terse surf alert including: which beach, wave height, period, wind, swell direction, and a
+        one-sentence recommendation. Prefix with "SURF ALERT: ".
+
+        4. If conditions are poor: call save_memory_entry with memoryName="notes" and a one-line
+        entry like "Surf check [time]: conditions poor — [brief reason]".
+
+
+        Always call save_memory_entry exactly once. No other output needed.
+      temperature: 0.3
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
