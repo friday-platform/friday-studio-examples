@@ -9,6 +9,7 @@ signals:
     config:
       schedule: '*/30 * * * *'
       timezone: UTC
+      onMissed: skip
 jobs:
   surf-watch:
     description: Checks San Diego surf conditions every 30 min and notifies David if surf is good
@@ -46,24 +47,20 @@ agents:
         to notify David.
 
 
-        GOOD SURF criteria (at least one beach should meet these):
+        GOOD SURF — ALL of these must hold for at least one beach:
 
         - Wave height: 3 feet or larger
 
         - Wave period: 8 seconds or longer
 
-        - Wind: offshore or light (< 10 mph); onshore winds above 15 mph = poor
+        - Wind: offshore or light onshore (< 15 mph)
 
         - Swell direction: NW, W, or SW (good for SD beaches)
 
 
-        POOR conditions (skip notification):
-
-        - Wave height under 2 feet
-
-        - Choppy onshore wind above 15 mph
-
-        - Short period (under 7 seconds) wind swell
+        POOR — anything that is not GOOD. Specifically: height under 3 feet,
+        OR period under 8 seconds, OR onshore wind 15 mph or stronger, OR
+        swell direction not in {NW, W, SW}.
 
 
         Steps:

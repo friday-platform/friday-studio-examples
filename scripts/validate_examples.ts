@@ -21,15 +21,6 @@ import { validateWorkspace } from "@atlas/config";
 
 const REPO_ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const KEBAB_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const SKIP_DIRS = new Set([
-  ".github",
-  ".claude",
-  ".git",
-  "assets",
-  "site",
-  "node_modules",
-  "scripts",
-]);
 
 interface ExamplesEntry {
   name?: unknown;
@@ -42,7 +33,7 @@ function discoverExampleFolders(): string[] {
   for (const entry of Deno.readDirSync(REPO_ROOT)) {
     if (!entry.isDirectory) continue;
     if (entry.name.startsWith(".")) continue;
-    if (SKIP_DIRS.has(entry.name)) continue;
+    if (!fileExists(`${REPO_ROOT}/${entry.name}/workspace.yml`)) continue;
     folders.push(entry.name);
   }
   folders.sort();
@@ -184,6 +175,21 @@ function validateWorkspaceYml(
     const loc = issue.path ? `${issue.path}: ` : "";
     warnings.push(`${folder}/workspace.yml: ${loc}${issue.message} [${issue.code}]`);
   }
+
+  // House-style: job IDs must be kebab-case. The canonical schema accepts
+  // any MCP-compliant tool name ([a-zA-Z0-9_-]+); examples should be uniform.
+  if (typeof doc === "object" && doc !== null && "jobs" in doc) {
+    const jobs = (doc as { jobs?: unknown }).jobs;
+    if (typeof jobs === "object" && jobs !== null) {
+      for (const jobId of Object.keys(jobs)) {
+        if (!KEBAB_RE.test(jobId)) {
+          errors.push(
+            `${folder}/workspace.yml: job id '${jobId}' must be kebab-case`,
+          );
+        }
+      }
+    }
+  }
 }
 
 function main(): number {
@@ -209,8 +215,9 @@ function main(): number {
   if (errors.length > 0) {
     console.error(`Found ${errors.length} validation error(s):`);
     for (const e of errors) console.error(`  - ${e}`);
-    return 1;
   }
+  // Examples should be exemplary: any warning is a defect users would inherit.
+  if (errors.length > 0 || warnings.length > 0) return 1;
   console.log(`OK — ${folders.length} examples validated.`);
   return 0;
 }

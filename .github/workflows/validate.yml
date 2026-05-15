@@ -76,4 +76,4 @@ jobs:
         with:
           deno-version: v2.x
       - name: Validate examples.json + workspace.yml against canonical schema
-        run: deno run -A --config .friday-studio/deno.json scripts/validate_examples.ts
+        run: deno run --allow-read --allow-env --allow-sys --config .friday-studio/deno.json scripts/validate_examples.ts
