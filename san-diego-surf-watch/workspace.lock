@@ -1,0 +1,8 @@
+schemaVersion: 1
+mode: definition
+workspace:
+  name: San Diego Surf Watch
+  version: '1.0'
+primitives:
+  skills: {}
+  agents: {}

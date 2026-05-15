@@ -66,10 +66,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - name: Checkout friday-studio (for canonical @atlas/config schema)
+        uses: actions/checkout@v6
         with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: pip install --quiet pyyaml
-      - name: Validate examples.json + workspace.yml structure
-        run: python3 scripts/validate_examples.py
+          repository: friday-platform/friday-studio
+          ref: '0.1.8'
+          path: .friday-studio
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Validate examples.json + workspace.yml against canonical schema
+        run: deno run --allow-read --allow-env --allow-sys --config .friday-studio/deno.json scripts/validate_examples.ts
