@@ -13,6 +13,10 @@ Good conditions trigger a `SURF ALERT` entry in long-term memory. Poor condition
 
 ---
 
+![screenshot](../assets/san-diego-surf-watch/output.png)
+
+---
+
 ## Setup
 
 ### 1. Download Friday
