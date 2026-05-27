@@ -7,7 +7,7 @@ primitives:
   skills: {}
   agents:
     kb-ingest-agent:
-      hash: 'sha256:b481e4022c659126fc1a59a95ae6145258b3644f22befa1ec54061240dcadf2e'
+      hash: 'sha256:52cb39bbfb31d22eaefb6b8747dee939ae9d5688952a9264e988fb03ceb905a2'
       path: agents/kb-ingest-agent
     kb-query-agent:
       hash: 'sha256:f3b914aed33aa3131d01a823ff32859314995c378ac9f2b67f487ed8ca7f4d2b'

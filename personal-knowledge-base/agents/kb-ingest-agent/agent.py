@@ -155,8 +155,8 @@ def find_upload_by_artifact_id(artifact_id: str) -> str | None:
 
 
 def strip_html(text: str) -> str:
-    text = re.sub(r"<script[^>]*>.*?</\s*script\s*>", "", text, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<style[^>]*>.*?</\s*style\s*>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<script\b[^>]*>.*?</script[^>]*>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<style\b[^>]*>.*?</style[^>]*>", "", text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<[^>]+>", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
