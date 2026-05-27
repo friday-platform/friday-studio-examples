@@ -46,5 +46,9 @@
   {
     "name": "San Diego Surf Watch",
     "folder": "san-diego-surf-watch"
+  },
+  {
+    "name": "Personal Knowledge Base",
+    "folder": "personal-knowledge-base"
   }
 ]

@@ -1,0 +1,135 @@
+version: '1.0'
+workspace:
+  name: Personal Knowledge Base
+  description: Feed it URLs and PDFs — it indexes them and answers questions like "what do we know about X"
+signals:
+  ingest-url:
+    description: Trigger URL ingestion into the knowledge base
+    schema:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL to fetch and index
+      required:
+        - url
+    provider: http
+    config:
+      path: /ingest-url
+  ingest-pdf:
+    description: Trigger PDF ingestion into the knowledge base
+    schema:
+      type: object
+      properties:
+        artifact_id:
+          type: string
+          description: The artifact ID of the uploaded PDF
+        source_label:
+          type: string
+          description: Human-readable name for the document (e.g. filename)
+      required:
+        - artifact_id
+    provider: http
+    config:
+      path: /ingest-pdf
+  query-kb:
+    description: Query the knowledge base with a question
+    schema:
+      type: object
+      properties:
+        question:
+          type: string
+          description: The question to answer from the knowledge base
+      required:
+        - question
+    provider: http
+    config:
+      path: /query-kb
+jobs:
+  ingest-url:
+    description: Fetches a URL and indexes it into the knowledge base
+    triggers:
+      - signal: ingest-url
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            ingest-url:
+              target: ingest
+        ingest:
+          entry:
+            - type: agent
+              agentId: url-ingester
+              outputTo: ingest-result
+              prompt: 'Fetch and index this URL: {{inputs.url}}'
+          type: final
+  ingest-pdf:
+    description: Parses a PDF artifact and indexes it into the knowledge base
+    triggers:
+      - signal: ingest-pdf
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            ingest-pdf:
+              target: ingest
+        ingest:
+          entry:
+            - type: agent
+              agentId: pdf-ingester
+              outputTo: ingest-result
+              prompt: '{"artifact_id": "{{inputs.artifact_id}}", "source_label": "{{inputs.source_label}}"}'
+          type: final
+  query-kb:
+    description: Queries the knowledge base and synthesizes an answer
+    triggers:
+      - signal: query-kb
+    fsm:
+      initial: idle
+      states:
+        idle:
+          'on':
+            query-kb:
+              target: answer
+        answer:
+          entry:
+            - type: agent
+              agentId: kb-query
+              outputTo: kb-answer
+              prompt: '{"question": "{{inputs.question}}"}'
+          type: final
+agents:
+  url-ingester:
+    description: Ingests a URL into the knowledge base using BGE-large embeddings + sqlite-vec
+    type: user
+    agent: kb-ingest-agent
+  pdf-ingester:
+    description: Ingests a PDF artifact into the knowledge base using BGE-large embeddings + sqlite-vec
+    type: user
+    agent: kb-ingest-agent
+  kb-query:
+    description: 'Queries the knowledge base with ANN vector search, returns synthesized answer'
+    type: user
+    agent: kb-query-agent
+memory:
+  own:
+    - name: notes
+      type: short_term
+      strategy: narrative
+    - name: memory
+      type: long_term
+      strategy: narrative
+    - name: knowledge-base
+      type: long_term
+      strategy: narrative
+  mounts:
+    - name: user-notes
+      source: user/narrative/notes
+      mode: ro
+      scope: workspace
+    - name: user-memory
+      source: user/narrative/memory
+      mode: ro
+      scope: workspace
