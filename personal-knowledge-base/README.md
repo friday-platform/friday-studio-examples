@@ -32,7 +32,23 @@ The two Python agents bring their own dependencies via `pyproject.toml`. The fir
 
 This is one-time per host and takes a couple of minutes. Subsequent runs are fast. No manual `pip` or `venv` step.
 
-### 4. That's it
+> **The model download is ~1.3 GB.** On a slow or flaky connection it can stall. If it does, set `HF_HUB_DISABLE_XET=1` in Friday's environment and retrigger — it switches HuggingFace to the plain HTTP downloader, which is more resilient to interrupted transfers.
+
+### 4. Make sure Python can load SQLite extensions
+
+`sqlite-vec` is a **loadable SQLite extension**, so the agents need a Python whose `sqlite3` module was compiled with extension support. The default macOS system Python and the python.org 3.12 build ship **without** it, and `uv run --python 3.12` may select one of those. When that happens, the agents fail immediately with a clear error:
+
+> This Python lacks SQLite loadable-extension support, which sqlite-vec requires…
+
+The fix is one command — install a uv-managed CPython, which has extension support enabled:
+
+```bash
+uv python install 3.12
+```
+
+Then retrigger the workspace. `requires-python = ">=3.12"` in each agent's `pyproject.toml` only gates the version, not the build flag, so this can't be caught at install time — the preflight guard catches it at runtime instead.
+
+### 5. That's it
 
 No API keys to configure beyond Anthropic (already set during Friday setup). No external services. The vector DB lives at `~/.friday/local/workspaces/personal-knowledge-base/kb.db`.
 

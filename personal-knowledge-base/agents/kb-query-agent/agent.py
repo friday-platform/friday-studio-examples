@@ -22,6 +22,27 @@ def serialize_vector(vec) -> bytes:
     return struct.pack(f"{len(vec)}f", *vec)
 
 
+def require_sqlite_extensions() -> None:
+    """sqlite-vec is a loadable SQLite extension, so it needs a Python whose
+    sqlite3 was compiled with extension support. The default macOS / python.org
+    3.12 build ships without it; `uv run --python 3.12` may select that build and
+    `enable_load_extension` then doesn't exist, surfacing as an opaque
+    AttributeError. Probe an in-memory connection so we fail loudly with an
+    actionable message."""
+    probe = sqlite3.connect(":memory:")
+    try:
+        if not hasattr(probe, "enable_load_extension"):
+            raise RuntimeError(
+                "This Python lacks SQLite loadable-extension support, which "
+                "sqlite-vec requires. The default macOS / python.org 3.12 build "
+                "ships without it. Fix: run `uv python install 3.12` to install a "
+                "uv-managed CPython (extensions enabled), then retrigger. See the "
+                "workspace README for details."
+            )
+    finally:
+        probe.close()
+
+
 @agent(
     id="kb-query-agent",
     version="1.0.0",
@@ -41,6 +62,8 @@ def execute(prompt: str, ctx: AgentContext):
                 "sources_consulted": [],
                 "chunks_retrieved": 0,
             })
+
+        require_sqlite_extensions()
 
         ctx.stream.progress("Loading embedding model...")
         model = SentenceTransformer(MODEL_NAME)

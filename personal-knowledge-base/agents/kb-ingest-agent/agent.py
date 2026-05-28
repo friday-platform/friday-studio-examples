@@ -188,7 +188,29 @@ def serialize_vector(vec) -> bytes:
     return struct.pack(f"{len(vec)}f", *vec)
 
 
+def require_sqlite_extensions() -> None:
+    """sqlite-vec is a loadable SQLite extension, so it needs a Python whose
+    sqlite3 was compiled with extension support. The default macOS / python.org
+    3.12 build ships without it; `uv run --python 3.12` may select that build and
+    `enable_load_extension` then doesn't exist, surfacing as an opaque
+    AttributeError. Probe an in-memory connection so we fail loudly (and before
+    creating an empty kb.db) with an actionable message."""
+    probe = sqlite3.connect(":memory:")
+    try:
+        if not hasattr(probe, "enable_load_extension"):
+            raise RuntimeError(
+                "This Python lacks SQLite loadable-extension support, which "
+                "sqlite-vec requires. The default macOS / python.org 3.12 build "
+                "ships without it. Fix: run `uv python install 3.12` to install a "
+                "uv-managed CPython (extensions enabled), then retrigger. See the "
+                "workspace README for details."
+            )
+    finally:
+        probe.close()
+
+
 def init_db() -> sqlite3.Connection:
+    require_sqlite_extensions()
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.enable_load_extension(True)
