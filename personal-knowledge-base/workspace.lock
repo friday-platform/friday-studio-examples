@@ -1,0 +1,14 @@
+schemaVersion: 1
+mode: definition
+workspace:
+  name: Personal Knowledge Base
+  version: '1.0'
+primitives:
+  skills: {}
+  agents:
+    kb-ingest-agent:
+      hash: 'sha256:d6b56786d50e3cb09fa7e9e1a4c0d65bcd48b4c8cd5e79b5309afaca60fd5083'
+      path: agents/kb-ingest-agent
+    kb-query-agent:
+      hash: 'sha256:409e0efe2526cec106094b6b911ec129c671d3178fcffb141b9bf970b3a5b557'
+      path: agents/kb-query-agent

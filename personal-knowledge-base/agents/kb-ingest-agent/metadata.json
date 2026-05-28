@@ -1,0 +1,6 @@
+{
+  "id": "kb-ingest-agent",
+  "version": "1.0.0",
+  "description": "Ingests a URL or PDF artifact into the personal knowledge base. Chunks content, embeds with BAAI/bge-large-en-v1.5, stores vectors in SQLite with sqlite-vec.",
+  "entrypoint": "agent.py"
+}

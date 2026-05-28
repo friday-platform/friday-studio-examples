@@ -1,0 +1,6 @@
+{
+  "id": "kb-query-agent",
+  "version": "1.0.0",
+  "description": "Queries the personal knowledge base. Embeds a question with BAAI/bge-large-en-v1.5, performs ANN search in sqlite-vec, retrieves top-K chunks, and synthesizes a grounded answer.",
+  "entrypoint": "agent.py"
+}
