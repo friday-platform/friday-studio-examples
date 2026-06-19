@@ -12,7 +12,7 @@ jobs:
   yaml:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run yamllint
         uses: karancode/yamllint-github-action@v3.0.0
         with:
@@ -22,7 +22,7 @@ jobs:
   markdown:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run markdownlint
         uses: DavidAnson/markdownlint-cli2-action@v23
         with:
@@ -31,7 +31,7 @@ jobs:
   folder-names:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Enforce kebab-case example folders
         run: |
           set -euo pipefail
@@ -65,9 +65,9 @@ jobs:
   examples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Checkout friday-studio (for canonical @atlas/config schema)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: friday-platform/friday-studio
           ref: '0.1.8'
